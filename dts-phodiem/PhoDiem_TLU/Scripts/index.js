@@ -28,7 +28,11 @@ function handlefilter() {
     var butt = document.getElementById('btn-submit');
     butt.addEventListener('click', function (event) {
     });
+
+
     $('form').submit(function (even) {
+        $("#_loading").show();
+        $("#main_content").hide();
         if (even.originalEvent.submitter.value == 'Lọc') {
             $.ajax({
                 method: $(this).attr('method'),
@@ -54,6 +58,8 @@ function handlefilter() {
                         showHandler(response.type);
 
                         console.log(response.data)
+                        $("#_loading").hide();
+                        $("#main_content").show()
                     }
                     else {
                         console.log(reponse.sublist);

@@ -13,14 +13,16 @@
     <!--import JQuery-->
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 
-    <!--My JavaScript-->
-   <script type="text/javascript" src="~/Scripts/index.js"></script>
+
 
 
 
 </head>
 
 <body>
+    <div id="_loading" style="display:none;padding-top:10%; margin-left:42%">
+        <img src="~/Content/img/gif/loading.gif" style="width:150px" />
+    </div>
     <div id="main_content">
         <div class="page-container">
             <div class="form__select">
@@ -58,6 +60,7 @@
                     <thead>
                         <tr id="list-header" rowspan="2">
                             <th scope="col">STT</th>
+                            <th scope="col">Học kỳ</th>
                             <th scope="col">Lớp học phần</th>
                             <th scope="col">Giảng viên</th>
                             <th scope="col">Tổng số</th>
@@ -123,17 +126,17 @@
             <div class="chart__mark">
 
                 <div class="chart__mark-btn-group">
-                    <button onclick="showChart(`chart-bar__id-bar-2`,`chart-bar__id-pie-2`)" class="btn chart__mark-show__btn">
-                        Test Biểu đồ
-                    </button>
+                    @*<button onclick="showChart(`chart-bar__id-bar-2`,`chart-bar__id-pie-2`)" class="btn chart__mark-show__btn">
+                            Test Biểu đồ
+                        </button>*@
                     <button onclick="showChart(`chart-bar__id-pie-2`,`chart-bar__id-bar-2`)" class="btn chart__mark-show__btn">
                         Hiện biểu đồ
                     </button>
                 </div>
                 <div class="chart__mark-char">
-                    <div id="chart-bar__id-pie-2" class="chart__mark-char-pie " style="display:none;">
-                        <canvas id="testChartPie" width="1000" style="width:100%;max-width:1000px"></canvas>
-                    </div>
+                    @*<div id="chart-bar__id-pie-2" class="chart__mark-char-pie " style="display:none;">
+                            <canvas id="testChartPie" width="1000" style="width:100%;max-width:1000px"></canvas>
+                        </div>*@
                     <div id="chart-bar__id-bar-2" class="chart__mark-char-bar " style="display:none;">
                         <canvas id="testChart2" width="1000" style="width:100%;max-width:1000px"></canvas>
                     </div>
@@ -141,8 +144,10 @@
                 </div>
             </div>
         </div>
-        
-    </div>   
+
+    </div>
+    <!--My JavaScript-->
+    <script type="text/javascript" src="~/Scripts/index.js"></script>
 </body>
 </html>
 
