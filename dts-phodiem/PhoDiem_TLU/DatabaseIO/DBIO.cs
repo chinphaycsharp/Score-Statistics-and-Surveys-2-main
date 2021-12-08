@@ -11,7 +11,8 @@ namespace PhoDiem_TLU.DatabaseIO
     public class DBIO
     {
         DTSTLUModels models = new DTSTLUModels();
-
+        //Khai báo log
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(DBIO));
         //Lấy thông tin danh sách sinh viên của một môn học trong nhiều năm
         public List<Mark> getMarks(long? subject_id, long? school_year_id_start, long? school_year_id_end)
         {
@@ -521,13 +522,7 @@ namespace PhoDiem_TLU.DatabaseIO
             }
             return result;
         }
-
-        public string getSemester(long? hocKy)
-        {
-            var semesterName = models.tbl_semester.Where(x => x.id == hocKy).Select(x => x.semester_name).FirstOrDefault();
-            return semesterName;
-        }
-
+        
         public List<Data> getCourseSubjectData(List<StudentCourseSubject> studentCourseSubjects, long subject_exam_type_id )
         {
             var Marks = (from scs in studentCourseSubjects
@@ -646,6 +641,7 @@ namespace PhoDiem_TLU.DatabaseIO
             }
             return result;
         }
+        //lay ti le diem cua giao vien
         public List<MarkByTeacher> getMarkByTeacher(List<Data> sublist)
         {
             var result = (from sl in sublist
@@ -888,5 +884,138 @@ namespace PhoDiem_TLU.DatabaseIO
             
             return list_result.ToList();
         }
+        public dynamic getListMarkByTeacher(int teacherID,int courseYearID,int semesterID)
+        {
+            try
+            {
+                var result = (
+                        from semesterSubject in models.tbl_semester_subject
+
+                        //lay lop hoc phan
+                        join courseSubject in models.tbl_course_subject
+                        on semesterSubject.id equals courseSubject.semester_subject_id
+                        
+                        join studentCourseSubject in models.tbl_student_course_subject
+                        on courseSubject.id equals studentCourseSubject.course_subject_id
+
+                        join studentSubjectMark in models.tbl_student_subject_mark
+                        on studentCourseSubject.student_id equals studentSubjectMark.student_id
+
+                        join studentMark in models.tbl_student_mark
+                        on studentSubjectMark.id equals studentMark.student_subject_mark_id
+
+                        join subjectExam in models.tbl_subject_exam
+                        on studentMark.subject_exam_id equals subjectExam.id
+
+                        join subject in models.tbl_subject
+                        on semesterSubject.subject_id equals subject.id
+
+                        join semester in models.tbl_semester
+                        on semesterSubject.semester_id equals semester.id
+
+                        join courseYear in models.tbl_course_year
+                        on semesterSubject.course_year_id equals courseYear.id
+
+                        join person in models.tbl_person
+                        on courseSubject.teacher_id equals person.user_id 
+                        where semester.id == semesterID
+                        && courseYear.id == courseYearID
+                        && courseSubject.teacher_id == teacherID
+                        && studentSubjectMark.semester_id == semesterID
+                        && semesterSubject.subject_id == studentSubjectMark.subject_id
+
+                        select new
+                        {
+                            subjectName = subject.subject_name,
+                            semesterName = semester.semester_name,
+                            courseYearName = courseYear.name,
+                            teacherID = teacherID,
+                            teacherName = person.display_name,
+                            courseSubjectID = courseSubject.id,
+                            courseSubjectName = courseSubject.display_name,
+                            numberOfCredit = subject.number_of_credit,
+                            student_mark = studentMark.mark,
+                            student_subject_mark = studentSubjectMark.mark,
+                            code = subjectExam.code
+                        }
+                    ).ToList();
+                return result;
+
+            }
+            catch(Exception ex)
+            {
+                return new List<dynamic>();
+                log.Error(ex.Message);
+            }
+        }
+        public dynamic getListNameTeachers()
+        {
+            try
+            {
+                var role = models.tbl_role.Where(r => r.id == 13).FirstOrDefault();
+                var user = role.tbl_user;
+                var person = models.tbl_person.ToList();
+                var list = (from p in person
+                            join u in user
+                            on p.user_id equals u.id
+                            select new
+                            {
+                                id = u.id,
+                                name = p.display_name,
+                            }).ToList();
+                return list;
+            }
+            catch(Exception ex)
+            {
+                log.Error(ex.Message);
+                return new List<dynamic>();
+            }
+        }
+        // Semester
+        public string getSemester(long? hocKy)
+        {
+            var semesterName = models.tbl_semester.Where(x => x.id == hocKy).Select(x => x.semester_name).FirstOrDefault();
+            return semesterName;
+        }
+        public dynamic getSemester(int startYear, int endYear)
+        {
+            try
+            {
+                var list = (
+                        from s in models.tbl_semester
+                        join c in models.tbl_shool_year
+                        on s.school_year_id equals c.id
+                        where c.year >= startYear && c.year <= endYear
+                        select new
+                        {
+                            id = s.id,
+                            name = s.semester_name
+                        }
+
+
+                    ).ToList();
+                return list;
+            }
+            catch (Exception e)
+            {
+                log.Error(e.Message);
+                return new List<dynamic>();
+            }
+        }
+
+        // Course Year
+        public List<tbl_course_year> getCourseYear()
+        {
+            try
+            {
+                return models.tbl_course_year.ToList();
+            }
+            catch (Exception e)
+            {
+                log.Error(e.Message);
+                return new List<tbl_course_year>();
+            }
+        }
+
     }
 }

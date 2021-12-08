@@ -292,7 +292,6 @@ D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\b
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\bin\EPPlus.xml
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\bin\Microsoft.IO.RecyclableMemoryStream.xml
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
-D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\obj\Debug\XLT_TLU.Models.csproj.AssemblyReference.cache
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\obj\Debug\XLT_TLU.Models.csproj.CoreCompileInputs.cache
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\obj\Debug\XLT_TLU.Models.csproj.CopyComplete
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\obj\Debug\XLT_TLU.Models.dll

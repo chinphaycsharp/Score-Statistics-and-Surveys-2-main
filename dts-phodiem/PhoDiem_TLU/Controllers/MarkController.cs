@@ -20,6 +20,9 @@ namespace PhoDiem_TLU.Controllers
         // GET: Mark
         private DBIO dBIO = new DBIO();
         private ExcelExport ex = new ExcelExport();
+
+        //Khai báo log
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(MarkController));
         public ActionResult Index()
         {
             setViewbag();
@@ -207,7 +210,7 @@ namespace PhoDiem_TLU.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                log.Error(e.Message);
                 return Json(new { code = 404, msg = e.Message }, JsonRequestBehavior.AllowGet);
             }
             
@@ -294,7 +297,90 @@ namespace PhoDiem_TLU.Controllers
             }
             else return RedirectToAction("Index");
         }
-        
+        [HttpGet]
+        public ActionResult MarkByTeacher()
+        {
+            log.Info("Info");
+            setViewBagTeacher();
+            setViewBagYear();
+            setViewBagMarkOption();
+            setViewBagCourseYear();
+            return View();
+        }
+        [HttpPost]
+        public JsonResult MarkByTeacher(int teacher, int semester,int courseYear,string markOption)
+        {
+            try
+            {
+                var t = teacher;
+                var s = semester;
+                var c = courseYear;
+                var m = markOption;
+                var list = dBIO.getListMarkByTeacher(4444, 3, 2);
+                return Json(new { code = 200,list }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return Json(new {code = 500}, JsonRequestBehavior.AllowGet);
+            }
+        }
+        [HttpGet]
+        public JsonResult test()
+        {
+            try
+            {
+                var list = dBIO.getListMarkByTeacher(4444, 2, 3);
+                return Json(new { code = 200, list }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return Json(new { code = 500 }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        private void setViewBagYear()
+        {
+            var years = dBIO.getYear();
+            SelectList y = new SelectList(years, "year", "year");
+            ViewBag.years = y;
+        }
+        private void setViewBagTeacher()
+        {
+            var teacherName = dBIO.getListNameTeachers();
+            
+            SelectList y = new SelectList(teacherName, "id", "name");
+            ViewBag.teacherName = y;
+        }
+        private void setViewBagMarkOption()
+        {
+            List<SelectListItem> listOption = new List<SelectListItem>();
+            listOption.Add(new SelectListItem() { Text = "Điểm quá trình", Value = "Điểm quá trình" });
+            listOption.Add(new SelectListItem() { Text = "Điểm thi", Value = "Điểm thi" });
+            listOption.Add(new SelectListItem() { Text = "Điểm tổng kết", Value = "Điểm tổng kết" });
+            SelectList markOption = new SelectList(listOption, "Value", "Text");
+            ViewBag.markOption = markOption;
+        }
+        private void setViewBagCourseYear()
+        {
+            var courseYear = dBIO.getCourseYear();
+            SelectList s = new SelectList(courseYear, "id", "name");
+            ViewBag.courseYear = s;
+        }
+        public JsonResult getSemester(int startYear,int endYear)
+        {
+            try
+            {
+                var semester = dBIO.getSemester(startYear,endYear);
+                return Json(new {code = 200,semester},JsonRequestBehavior.AllowGet);
+
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return Json(new {code = 500},JsonRequestBehavior.AllowGet);
+            }
+        }
     }
     
 }

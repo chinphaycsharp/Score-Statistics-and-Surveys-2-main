@@ -1602,3 +1602,5 @@ D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\obj\
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\obj\Debug\PhoDiem_TLU.csproj.CopyComplete
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\obj\Debug\PhoDiem_TLU.dll
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\obj\Debug\PhoDiem_TLU.pdb
+D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\bin\log4net.dll
+D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\bin\log4net.xml

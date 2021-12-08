@@ -29,11 +29,11 @@ namespace PhoDiem_TLU.Controllers
             {
                 pager = new Pager(pagination.totalElements, page, pageSize);
             }
-            else
-            {
-                //Chỗ này thêm thông báo nếu người dùng k có quyền hiển thị ra
-                return RedirectToAction("Index", "Login");
-            }
+            //else
+            //{
+            //    //Chỗ này thêm thông báo nếu người dùng k có quyền hiển thị ra
+            //    return RedirectToAction("Index", "Login");
+            //}
 
 
             int recSkip = (page - 1) * pageSize;

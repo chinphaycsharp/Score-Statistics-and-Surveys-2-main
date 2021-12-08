@@ -8,7 +8,7 @@ namespace PhoDiem_TLU.ViewModels
     public class Mark
     {
         public string semesterName { get; set; }
-        public long couresSubjectID { get; set; }
+        public long? couresSubjectID { get; set; }
         public string courseSubjectName { get; set; }
         public string teacherName { get; set; }
         public double? student_Mark { get; set; }
@@ -17,12 +17,13 @@ namespace PhoDiem_TLU.ViewModels
         public string subjectName { get; set; }
 
         public long? numberOfCredit { get; set; }
+        public string studentMarkType { get; set; }
         public Mark()
         {
 
         }
 
-        public Mark(string semesterName, long couresSubjectID, string courseSubjectName, string teacherName, double? student_Mark, double? student_Subject_Mark, string subjectName, long? numberOfCredit)
+        public Mark(string semesterName, long? couresSubjectID, string courseSubjectName, string teacherName, double? student_Mark, double? student_Subject_Mark, string subjectName, long? numberOfCredit)
         {
             this.semesterName = semesterName;
             this.couresSubjectID = couresSubjectID;

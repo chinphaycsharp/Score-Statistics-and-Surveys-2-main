@@ -209,6 +209,10 @@ namespace PhoDiem_TLU.Core
         {
             UserLogin user = LoginTokenHttpClient.GetUser(tokenResult);
             bool isAdmin = false;
+            if (user != null)
+            {
+                return null;
+            }
             foreach (var item in user.roles)
             {
                 if(item.name == Constants.ROLE_ADMIN)
