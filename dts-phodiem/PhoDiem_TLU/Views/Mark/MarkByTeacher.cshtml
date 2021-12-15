@@ -12,30 +12,30 @@
             <div class="form__select-input">
                 @using (Html.BeginForm("MarkByTeacher", "Mark", FormMethod.Post))
                 {
-                    <div class="form__select-input-container">
-                        @*@Html.ValidationSummary(true)*@
-                        <div class="select__group">
-                            @Html.DropDownList("teacher", (IEnumerable<SelectListItem>)ViewBag.teacherName, "Giáo viên", new { @class = "select.input-group-sm form-control" })
-                            @Html.DropDownList("schoolYearStart", (IEnumerable<SelectListItem>)(ViewBag.years), "Năm xuất phát", new { @id="startYear", @class = "select.input-group-sm form-control" })
-                            @Html.DropDownList("schoolYearEnd", (IEnumerable<SelectListItem>)(ViewBag.years), "Năm kết thúc", new { @id ="endYear",@class = "select.input-group-sm form-control" })
-                            <select id="semester" name="semester" class="select.input-group-sm form-control">
-                                <option value> Kì học </option>
-                            </select>
-                            
+                <div class="form__select-input-container">
+                    @Html.ValidationSummary(true)
+                    <div class="select__group">
+                        @Html.DropDownList("teacher", (IEnumerable<SelectListItem>)ViewBag.teacherName, "Giáo viên", new { @class = "select.input-group-sm form-control" })
+                        @Html.DropDownList("schoolYearStart", (IEnumerable<SelectListItem>)(ViewBag.years), "Năm xuất phát", new { @id = "startYear", @class = "select.input-group-sm form-control" })
+                        @Html.DropDownList("schoolYearEnd", (IEnumerable<SelectListItem>)(ViewBag.years), "Năm kết thúc", new { @id = "endYear", @class = "select.input-group-sm form-control" })
+                        <select id="semester" name="semester" class="select.input-group-sm form-control">
+                            <option value> Kì học </option>
+                        </select>
 
-                            @Html.DropDownList("courseYear", (IEnumerable<SelectListItem>)(ViewBag.courseYear), "Khóa học", new { @class = "select.input-group-sm form-control" })
-                            @Html.DropDownList("markOption", (IEnumerable<SelectListItem>)(ViewBag.markOption), "Loại điểm", new { @class = "select.input-group-sm form-control" })
 
-                        </div>
-                        <div class="select__btn-container">
-                            <div class="select__btn-group">
-                                <input id="show__btn-id" class="show-data__option-btn" type="submit" value="Hiển thị" />
-                                <button id="export__btn-id" class="show-data__option-btn" value="Export" formaction="@Url.Action("Export")" formmethod="post">
-                                    xuất file excel
-                                </button>
-                            </div>
+                        @Html.DropDownList("courseYear", (IEnumerable<SelectListItem>)(ViewBag.courseYear), "Khóa học", new { @class = "select.input-group-sm form-control" })
+                        @Html.DropDownList("markOption", (IEnumerable<SelectListItem>)(ViewBag.markOption), "Loại điểm", new { @class = "select.input-group-sm form-control" })
+
+                    </div>
+                    <div class="select__btn-container">
+                        <div class="select__btn-group">
+                            <input id="show__btn-id" class="show-data__option-btn" type="submit" value="Hiển thị" />
+                            <button id="export__btn-id" class="show-data__option-btn" value="Export" formaction="@Url.Action("Export")" formmethod="post">
+                                xuất file excel
+                            </button>
                         </div>
                     </div>
+                </div>
                 }
             </div>
         </div>

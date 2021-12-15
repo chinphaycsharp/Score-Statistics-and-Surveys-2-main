@@ -420,7 +420,7 @@ namespace PhoDiem_TLU.Helpers
             }
         }
 
-        public Byte[] ExportExcelDataTeacher(string markOption, string subjectName, long numberOfCredit, long startYear, long EndYear, List<MarkByTeacher> dataMark)
+        public Byte[] ExportExcelDataTeacher(string markOption, string subjectName, long numberOfCredit, long startYear, long EndYear, List<MarkRate> dataMark)
         {
             MemoryStream stream = new MemoryStream();
             using (ExcelPackage package = new ExcelPackage(stream))
@@ -835,7 +835,7 @@ namespace PhoDiem_TLU.Helpers
             }
         }
 
-        public Byte[] ExportExcelDataTeacher2(string markOption, string subjectName, long numberOfCredit, string semesterName, List<MarkByTeacher> dataMark)
+        public Byte[] ExportExcelDataTeacher2(string markOption, string subjectName, long numberOfCredit, string semesterName, List<MarkRate> dataMark)
         {
             MemoryStream stream = new MemoryStream();
             using (ExcelPackage package = new ExcelPackage(stream))

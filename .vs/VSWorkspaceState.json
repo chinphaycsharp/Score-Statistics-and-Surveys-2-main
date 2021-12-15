@@ -4,7 +4,7 @@
     "\\dts-phodiem",
     "\\dts-phodiem\\PhoDiem_TLU",
     "\\dts-phodiem\\PhoDiem_TLU\\Controllers",
-    "\\dts-phodiem\\PhoDiem_TLU\\DatabaseIO",
+    "\\dts-phodiem\\PhoDiem_TLU\\ViewModels",
     "\\dts-phodiem\\PhoDiem_TLU\\Views",
     "\\dts-phodiem\\PhoDiem_TLU\\Views\\Home",
     "\\dts-phodiem\\PhoDiem_TLU\\Views\\Mark",

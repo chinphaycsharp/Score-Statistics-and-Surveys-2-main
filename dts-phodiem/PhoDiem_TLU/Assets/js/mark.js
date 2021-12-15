@@ -59,7 +59,13 @@ $('form').submit(function (even) {
 function showHandler(val) {
     console.log(val);
     if (dataMark != null) {
-        let data = dataMark.map(Object.values);
+        var data = dataMark.map(data => {
+            var { courseSubjectName, ...newData } = data
+            return newData
+        })
+        
+        data = data.map(Object.values)
+        console.log(data)
         if (val === "HTN") {
             $("#table_id_course-subject").DataTable().clear();
             $("#table_id_course-subject").DataTable().rows.add(data);

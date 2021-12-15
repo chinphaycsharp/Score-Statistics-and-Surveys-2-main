@@ -272,7 +272,7 @@ namespace PhoDiem_TLU.Controllers
                 {
                     List<StudentCourseSubject> studentCourseSubjects
                         = dBIO.getMarks_3(hocKy, khoaHoc, dotHoc, monHoc);
-                    List<MarkByTeacher> dataMark;
+                    List<MarkRate> dataMark;
                     if (markOption == "Điểm thi")
                     {
                         dataMark = dBIO.getMarkByTeacher(studentCourseSubjects, 3);

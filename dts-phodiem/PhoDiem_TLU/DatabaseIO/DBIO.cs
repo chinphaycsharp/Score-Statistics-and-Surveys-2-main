@@ -416,7 +416,7 @@ namespace PhoDiem_TLU.DatabaseIO
 
         }
         //Lấy tong so diem A,B,C,D trong nhiều năm
-        public Object getSumMarks(List<MarkByTeacher> list)
+        public Object getSumMarks(List<MarkRate> list)
         {
             long[] result = { 0, 0, 0, 0, 0 };
             foreach(var item in list)
@@ -584,7 +584,7 @@ namespace PhoDiem_TLU.DatabaseIO
         }
         
         //lấy điểm của một môn học do giáo viên đảm nhận trong nhiêu năm
-        public List<MarkByTeacher> getMarkByTeacher(List<StudentCourseSubject> studentCourseSubjects, long subject_exam_type_id)
+        public List<MarkRate> getMarkByTeacher(List<StudentCourseSubject> studentCourseSubjects, long subject_exam_type_id)
         {
             var Marks = (from scs in studentCourseSubjects
                          join subjectExam in models.tbl_subject_exam
@@ -621,7 +621,7 @@ namespace PhoDiem_TLU.DatabaseIO
                               F = ls_group.Count(x => x.mark >= 0 && x.mark < 3.95),
                               numberOfCredit = ls_2.numberOfCredit
 
-                          }).Distinct().ToList().Select(x => new MarkByTeacher(0, x.subjectName, x.teacherName, x.Tong,
+                          }).Distinct().ToList().Select(x => new MarkRate(0, x.subjectName, x.teacherName, x.Tong,
                           x.A,
                           Math.Round((double)x.A * 100 / x.Tong, 2),
                           x.B,
@@ -642,7 +642,7 @@ namespace PhoDiem_TLU.DatabaseIO
             return result;
         }
         //lay ti le diem cua giao vien
-        public List<MarkByTeacher> getMarkByTeacher(List<Data> sublist)
+        public List<MarkRate> getMarkByTeacher(List<Data> sublist)
         {
             var result = (from sl in sublist
                           group sl by sl.teacherName into sl_group
@@ -659,7 +659,7 @@ namespace PhoDiem_TLU.DatabaseIO
                               D = sl_group.Sum(x => x.D),
                               F = sl_group.Sum(x => x.F),
                               numberOfCredit = sl_2.numberOfCredit
-                          }).Distinct().ToList().Select(x => new MarkByTeacher(0, x.subjectName, x.teacherName, x.Tong,
+                          }).Distinct().ToList().Select(x => new MarkRate(0, x.subjectName, x.teacherName, x.Tong,
                           x.A,
                           Math.Round((double)x.A * 100 / x.Tong, 2),
                           x.B,
@@ -884,11 +884,11 @@ namespace PhoDiem_TLU.DatabaseIO
             
             return list_result.ToList();
         }
-        public dynamic getListMarkByTeacher(int teacherID,int courseYearID,int semesterID)
+        public List<Mark> getListMarkByTeacher(int teacherID,int courseYearID,int semesterID,string code)
         {
             try
             {
-                var result = (
+                List<Mark> result = (
                         from semesterSubject in models.tbl_semester_subject
 
                         //lay lop hoc phan
@@ -923,7 +923,7 @@ namespace PhoDiem_TLU.DatabaseIO
                         && courseSubject.teacher_id == teacherID
                         && studentSubjectMark.semester_id == semesterID
                         && semesterSubject.subject_id == studentSubjectMark.subject_id
-
+                        && subjectExam.code == code
                         select new
                         {
                             subjectName = subject.subject_name,
@@ -938,14 +938,117 @@ namespace PhoDiem_TLU.DatabaseIO
                             student_subject_mark = studentSubjectMark.mark,
                             code = subjectExam.code
                         }
-                    ).ToList();
+                    ).ToList().Select(x => new Mark(x.subjectName, x.semesterName, x.courseYearName, x.teacherID, x.teacherName, x.courseSubjectID,
+                    x.courseSubjectName, x.numberOfCredit, x.student_mark, x.student_subject_mark, x.code)).ToList();
                 return result;
 
             }
             catch(Exception ex)
             {
-                return new List<dynamic>();
+                return new List<Mark>();
                 log.Error(ex.Message);
+            }
+        }
+
+        public List<MarkRate> getRateMarkByTeacher(int teacherID, int courseYearID, int semesterID,string markOption)
+        {
+            try
+            {
+                List<Mark> marks;
+                if (markOption == "DT") 
+                    marks = getListMarkByTeacher(teacherID, courseYearID, semesterID,"THI");
+                else marks = getListMarkByTeacher(teacherID, courseYearID, semesterID, "DQT");
+                var result = (from m in marks
+                              group m by m.couresSubjectID into m_group
+                              from m_i in marks
+                              where m_group.Key == m_i.couresSubjectID
+                              select new
+                              {
+                                  subjectName = m_i.subjectName,
+                                  courseSubjectName = m_i.courseSubjectName,
+                                  teacherName = m_i.teacherName,
+                                  Tong = m_group.Count(),
+                                  A = m_group.Count(x => x.student_Mark >= 8.45 && x.student_Mark <= 10),
+                                  B = m_group.Count(x => x.student_Mark >= 6.95 && x.student_Mark < 8.45),
+                                  C = m_group.Count(x => x.student_Mark >= 5.45 && x.student_Mark < 6.95),
+                                  D = m_group.Count(x => x.student_Mark >= 3.95 && x.student_Mark < 5.45),
+                                  F = m_group.Count(x => x.student_Mark >= 0 && x.student_Mark < 3.95),
+                                  numberOfCredit = m_i.numberOfCredit
+                              }
+
+                    ).Distinct().ToList().Select(x => new MarkRate(0, x.subjectName,x.courseSubjectName, x.teacherName, x.Tong,
+                          x.A,
+                          Math.Round((double)x.A * 100 / x.Tong, 2),
+                          x.B,
+                          Math.Round((double)x.B * 100 / x.Tong, 2),
+                          x.C,
+                          Math.Round((double)x.C * 100 / x.Tong, 2),
+                          x.D,
+                          Math.Round((double)x.D * 100 / x.Tong, 2),
+                          x.F,
+                          Math.Round((double)x.F * 100 / x.Tong, 2),
+                          x.numberOfCredit
+                          )).ToList();
+                int i = 1;
+                foreach (var item in result)
+                {
+                    item.stt = i++;
+                }
+                return result;
+            }
+            catch(Exception e)
+            {
+                log.Error(e.Message);
+                return new List<MarkRate>();
+            }
+        }
+        public List<MarkRate> getRateMarkByTeacher(int teacherID, int courseYearID, int semesterID)
+        {
+            try
+            {
+                List<Mark> marks = getListMarkByTeacher(teacherID, courseYearID, semesterID, "THI");
+                var result = (from m in marks
+                              group m by m.couresSubjectID into m_group
+                              from m_i in marks
+                              where m_group.Key == m_i.couresSubjectID
+                              select new
+                              {
+                                  subjectName = m_i.subjectName,
+                                  courseSubjectName = m_i.courseSubjectName,
+                                  teacherName = m_i.teacherName,
+                                  Tong = m_group.Count(),
+                                  A = m_group.Count(x => x.student_Subject_Mark >= 8.45 && x.student_Subject_Mark <= 10),
+                                  B = m_group.Count(x => x.student_Subject_Mark >= 6.95 && x.student_Subject_Mark < 8.45),
+                                  C = m_group.Count(x => x.student_Subject_Mark >= 5.45 && x.student_Subject_Mark < 6.95),
+                                  D = m_group.Count(x => x.student_Subject_Mark >= 3.95 && x.student_Subject_Mark < 5.45),
+                                  F = m_group.Count(x => x.student_Subject_Mark >= 0 && x.student_Subject_Mark < 3.95),
+                                  numberOfCredit = m_i.numberOfCredit
+                              }
+
+                    ).Distinct().ToList().Select(x => new MarkRate(0, x.subjectName, x.courseSubjectName, x.teacherName, x.Tong,
+                          x.A,
+                          Math.Round((double)x.A * 100 / x.Tong, 2),
+                          x.B,
+                          Math.Round((double)x.B * 100 / x.Tong, 2),
+                          x.C,
+                          Math.Round((double)x.C * 100 / x.Tong, 2),
+                          x.D,
+                          Math.Round((double)x.D * 100 / x.Tong, 2),
+                          x.F,
+                          Math.Round((double)x.F * 100 / x.Tong, 2),
+                          x.numberOfCredit
+                          )).ToList();
+                int i = 1;
+                foreach (var item in result)
+                {
+                    item.stt = i++;
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                log.Error(e.Message);
+                return new List<MarkRate>();
             }
         }
         public dynamic getListNameTeachers()
