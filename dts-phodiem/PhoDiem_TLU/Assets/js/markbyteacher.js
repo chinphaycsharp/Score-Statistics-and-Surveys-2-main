@@ -109,6 +109,7 @@ function handleSubmit() {
                     console.log(xhr);
                     console.log(ajaxOptions);
                     console.log(thrownError);
+                    alert('Không có dữ liệu');
                 }
             }).done(function (response) {
 
@@ -123,6 +124,7 @@ function handleSubmit() {
                     }
                     else {
                         console.log(reponse.data);
+                        alert('Không có dữ liệu');
                     }
                 }
                 else {

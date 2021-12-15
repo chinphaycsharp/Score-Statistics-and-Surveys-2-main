@@ -1080,6 +1080,11 @@ namespace PhoDiem_TLU.DatabaseIO
             var semesterName = models.tbl_semester.Where(x => x.id == hocKy).Select(x => x.semester_name).FirstOrDefault();
             return semesterName;
         }
+        public string getSemesterName(int id)
+        {
+            var semesterName = models.tbl_semester.Where(x => x.id == id).Select(x => x.semester_name).FirstOrDefault();
+            return semesterName;
+        }
         public dynamic getSemester(int startYear, int endYear)
         {
             try
@@ -1117,6 +1122,27 @@ namespace PhoDiem_TLU.DatabaseIO
             {
                 log.Error(e.Message);
                 return new List<tbl_course_year>();
+            }
+        }
+        public string getCourseYearName(int id)
+        {
+            var courserName = models.tbl_course_year.Where(x => x.id == id).Select(x => x.name).FirstOrDefault();
+            return courserName;
+        }
+
+        // TeacherName
+
+        public string getTeacherName(int teacherID)
+        {
+            try
+            {
+                var teacher = models.tbl_person.Where(x => x.user_id == teacherID).FirstOrDefault();
+                return teacher.display_name;
+            }
+            catch(Exception e)
+            {
+                log.Error(e.Message);
+                return "";
             }
         }
 

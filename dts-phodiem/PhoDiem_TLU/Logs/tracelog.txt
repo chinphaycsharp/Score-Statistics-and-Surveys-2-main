@@ -126,3 +126,16 @@
 2021-12-09 04:27:07,087 [34] INFO PhoDiem_TLU.Controllers.MarkController - Info
 2021-12-09 04:29:27,607 [55] INFO PhoDiem_TLU.Controllers.MarkController - Info
 2021-12-09 04:32:07,798 [47] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 01:05:19,335 [20] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 01:49:37,643 [40] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 01:51:58,305 [53] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 01:53:48,323 [39] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 01:59:29,638 [43] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 02:03:39,907 [17] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 02:07:08,880 [9] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 02:07:30,273 [17] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 02:22:37,238 [69] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 02:24:29,157 [63] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 02:33:46,523 [72] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 02:35:57,195 [80] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2021-12-16 02:36:10,136 [44] INFO PhoDiem_TLU.Controllers.MarkController - Info

@@ -298,7 +298,7 @@ namespace PhoDiem_TLU.Controllers
             else return RedirectToAction("Index");
         }
         [HttpPost]
-        public ActionResult Export(int teacher, int semester, int courseYear, string markOption)
+        public ActionResult ExportMarkByTeacher(int teacher, int semester, int courseYear, string markOption)
         {
             if (teacher != null && semester != null &&
                 courseYear != null && markOption != null)
@@ -306,91 +306,38 @@ namespace PhoDiem_TLU.Controllers
                 try
                 {
                     List<MarkRate> list;
-                    if (markOption == "DTK") list = dBIO.getRateMarkByTeacher(4444, 2, 3);
-                    else list = dBIO.getRateMarkByTeacher(4444, 2, 3, markOption);
+                    var teacherName = dBIO.getTeacherName(teacher);
+                    var semesterName = dBIO.getSemester(semester);
+                    var courseYearName = dBIO.getCourseYearName(courseYear);
+                    string markOptionName = "";
+                    if (markOption == "DTK")
+                    {
+                        list = dBIO.getRateMarkByTeacher(teacher, courseYear,semester);
+                        markOptionName = "Điểm tổng kết";
+                    }
+                    else if(markOption == "DT")
+                    {
+                        list = dBIO.getRateMarkByTeacher(teacher, courseYear, semester,markOption);
+                        markOptionName = "Điểm thi";
+                    }
+                    else
+                    {
+                        list = dBIO.getRateMarkByTeacher(teacher, courseYear, semester,markOption);
+                        markOptionName = "Điểm quá trình";
+                    }
 
-                    var fileName = $"{markOption}_{teacher}_{semester}-{courseYear}.xlsx";
-                    var data = ex.ExportExcelDataCourseSubject(markOption, subjectName, numberOfCredit, startYear, EndYear, dataMark);
+                    var fileName = $"{markOptionName}_{teacherName}_{semesterName}_{courseYearName}.xlsx";
+                    var data = ex.ExportExcelDataTeacher(markOptionName,teacherName,semesterName,courseYearName, list);
                     return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
                 }
                 catch (Exception ex)
                 {
                     log.Error(ex.Message);
-                    
+                    return RedirectToAction("MarkByTeacher");
                 }
-                long startYear = dBIO.getYear(school_year_id_start);
-                long EndYear = dBIO.getYear(school_year_id_end);
-                string subjectName = dBIO.getSubject(subject_id);
-                long numberOfCredit = dBIO.getNumberOfCredit(subject_id);
-                if (showoption == "HTN")
-                {
-                    List<StudentCourseSubject> studentCourseSubjects
-                        = dBIO.getMarks_2(subject_id, school_year_id_start, school_year_id_end);
-                    List<Data> dataMark;
-                    if (markOption == "Điểm thi")
-                    {
-                        dataMark = dBIO.getCourseSubjectData(studentCourseSubjects, 3);
-                    }
-                    else if (markOption == "Điểm quá trình")
-                    {
-                        dataMark = dBIO.getCourseSubjectData(studentCourseSubjects, 2);
-                    }
-                    else
-                    {
-                        var list = dBIO.getMarks(subject_id, school_year_id_start, school_year_id_end);
-                        dataMark = dBIO.getCourseSubjectData(list);
-                    }
-                    var fileName = $"{markOption}_{subjectName}_{startYear}-{EndYear}.xlsx";
-                    var data = ex.ExportExcelDataCourseSubject(markOption, subjectName, numberOfCredit, startYear, EndYear, dataMark);
-                    return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-                }
-                else if (showoption == "HTGV")
-                {
-                    List<StudentCourseSubject> studentCourseSubjects
-                        = dBIO.getMarks_2(subject_id, school_year_id_start, school_year_id_end);
-                    List<MarkRate> dataMark;
-                    if (markOption == "Điểm thi")
-                    {
-                        dataMark = dBIO.getMarkByTeacher(studentCourseSubjects, 3);
-                    }
-                    else if (markOption == "Điểm quá trình")
-                    {
-                        dataMark = dBIO.getMarkByTeacher(studentCourseSubjects, 2);
-                    }
-                    else
-                    {
-                        var list = dBIO.getMarks(subject_id, school_year_id_start, school_year_id_end);
-                        var sublist = dBIO.getCourseSubjectData(list);
-                        dataMark = dBIO.getMarkByTeacher(sublist);
-                    }
-                    var fileName = $"{markOption}_{subjectName}_{startYear}-{EndYear}.xlsx";
-                    var data = ex.ExportExcelDataTeacher(markOption, subjectName, numberOfCredit, startYear, EndYear, dataMark);
-                    return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-
-                }
-                else
-                {
-                    List<MarksByEnrollmentClass> dataMark;
-                    if (markOption == "Điểm quá trình")
-                    {
-                        dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end, 2);
-                    }
-                    else if (markOption == "Điểm thi")
-                    {
-                        dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end, 3);
-                    }
-                    else
-                    {
-                        //Diem tong ket
-                        dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end);
-
-                    }
-                    var fileName = $"{markOption}_{subjectName}_{startYear}-{EndYear}.xlsx";
-                    var data = ex.ExportExcelDataEnrollmentClass(markOption, subjectName, numberOfCredit, startYear, EndYear, dataMark);
-                    return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-                }
+                
             }
-            else return RedirectToAction("Index");
+            else return RedirectToAction("MarkByTeacher");
         }
         [HttpGet]
         public ActionResult MarkByTeacher()
@@ -408,8 +355,8 @@ namespace PhoDiem_TLU.Controllers
             try
             {
                 List<MarkRate> list ;
-                if(markOption == "DTK") list = dBIO.getRateMarkByTeacher(4444, 2, 3);
-                else list = dBIO.getRateMarkByTeacher(4444, 2, 3,markOption);
+                if(markOption == "DTK") list = dBIO.getRateMarkByTeacher(teacher, courseYear, semester);
+                else list = dBIO.getRateMarkByTeacher(teacher, courseYear, semester,markOption);
 
                 var dataChart = dBIO.getSumMarks(list);
                 return Json(new { code = 200,list,dataChart }, JsonRequestBehavior.AllowGet);

@@ -7,7 +7,7 @@
     <div class="page-container">
         <div class="form__select">
             <div class="form__select-header">
-                <h4 class="form__select-header-Text">Thông kê tỷ lệ(%) điểm A,B,C,D,F của giáo viên</h4>
+                <h4 class="form__select-header-Text">Thống kê tỷ lệ(%) điểm A,B,C,D,F của giáo viên</h4>
             </div>
             <div class="form__select-input">
                 @using (Html.BeginForm("MarkByTeacher", "Mark", FormMethod.Post))
@@ -30,7 +30,7 @@
                     <div class="select__btn-container">
                         <div class="select__btn-group">
                             <input id="show__btn-id" class="show-data__option-btn" type="submit" value="Hiển thị" />
-                            <button id="export__btn-id" class="show-data__option-btn" value="Export" formaction="@Url.Action("Export")" formmethod="post">
+                            <button id="export__btn-id" class="show-data__option-btn" value="Export" formaction="@Url.Action("ExportMarkByTeacher")" formmethod="post">
                                 xuất file excel
                             </button>
                         </div>
