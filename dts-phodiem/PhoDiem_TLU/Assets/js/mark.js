@@ -7,7 +7,8 @@ $(document).ready(function () {
     handlefilter();
     var table = $("#table_id_course-subject").DataTable({
         "processing": true,
-        });
+    });
+    console.log("OK")
         
 })
 
@@ -86,12 +87,18 @@ function showHandler(val) {
         else {
             var data = dataMark.map(data => {
                 var { courseSubjectName, ...newData } = data
-                return newData
+                return {
+                    ...newData,
+                    'button':'<button onclick="test()") class="download"><i class="fa fa-download" aria-hidden="true"></i></button>'
+                }
             })
-
+           
             data = data.map(Object.values)
             $("#table_id_enrollmentClass").DataTable().clear();
+            const tr = $("<tr><td>1</td><td>2</td></tr>");
+            console.log(data)
             $("#table_id_enrollmentClass").DataTable().rows.add(data);
+            console.log('test')
             $("#table_id_enrollmentClass").DataTable().draw();
             $("#table_id_teacher_wrapper").hide();
             $("#table_id_course-subject_wrapper").hide();
@@ -99,6 +106,9 @@ function showHandler(val) {
         }
 
     }
+}
+function test() {
+    alert("oke")
 }
 function fillDataToChart(list,type) {
     let typeChart = 'horizontalBar';

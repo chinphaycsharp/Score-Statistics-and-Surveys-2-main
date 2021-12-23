@@ -296,3 +296,4 @@ D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\o
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\obj\Debug\XLT_TLU.Models.csproj.CopyComplete
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\obj\Debug\XLT_TLU.Models.dll
 D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\obj\Debug\XLT_TLU.Models.pdb
+D:\.Net Project\Score-Statistics-and-Surveys-2-main\dts-phodiem\XLT_TLU.Models\obj\Debug\XLT_TLU.Models.csproj.AssemblyReference.cache
