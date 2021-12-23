@@ -330,6 +330,7 @@
     <Compile Include="ViewModels\UserViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\css\mark-by-semester\style.css" />
     <Content Include="Assets\css\reponsive.css" />
     <Content Include="Assets\css\style.css" />
     <Content Include="Assets\js\mark.js" />
@@ -9442,6 +9443,7 @@
     <Content Include="Content\plugins\toastr\toastr.js.map" />
     <Content Include="Content\bootstrap-chosen.scss" />
     <Content Include="Content\bootstrap-chosen.less" />
+    <None Include="Properties\PublishProfiles\PhoDiemTLU - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\chosen.jquery.js" />
     <Content Include="Scripts\chosen.jquery.min.js" />
@@ -9455,7 +9457,7 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Scripts\mark-by-semester.js" />
+    <Content Include="Assets\js\mark-by-semester\mark-by-semester.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
