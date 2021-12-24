@@ -9,9 +9,23 @@ $(document).ready(function () {
         "processing": true,
     });
     console.log("OK")
+    test()
         
 })
-
+const Marks = (function (){
+    var data = []
+    return {
+        getAllData() {
+            return data
+        },
+        setData(marks) {
+            data = [...marks]
+        },
+        getData(stt) {
+            return data[stt-1]
+        }
+    }
+}())
 function handlefilter() {
     var butt = document.getElementById('show__btn-id');
     butt.addEventListener('click', function (event) {
@@ -38,6 +52,7 @@ $('form').submit(function (even) {
             if (response.data != null) {
                 if (response.code == 200) {
                     dataMark = response.data;
+                    Marks.setData(response.data)
                     fillDataToChart(response.data, response.type);
                     fillDataToChartPie(response.sumMark);
                     ok = true;
@@ -85,30 +100,46 @@ function showHandler(val) {
             $("#table_id_enrollmentClass_wrapper").hide();
         }
         else {
-            var data = dataMark.map(data => {
-                var { courseSubjectName, ...newData } = data
+            var marks = Marks.getAllData()
+            var data = marks.map(data => {
+                var { stt, subjectName, enrollmentClassName, sumMark, A,rateA,B,rateB,C,rateC,D,rateD,F,rateF} = data
                 return {
-                    ...newData,
-                    'button':'<button onclick="test()") class="download"><i class="fa fa-download" aria-hidden="true"></i></button>'
+                    stt, subjectName, enrollmentClassName, sumMark, A, rateA, B, rateB, C, rateC, D, rateD, F,rateF,
+                    'button':`<button onclick= "handleExport(${stt})" class="download export"><i class="fa fa-download" aria-hidden="true"></i></button>`
                 }
             })
            
             data = data.map(Object.values)
             $("#table_id_enrollmentClass").DataTable().clear();
-            const tr = $("<tr><td>1</td><td>2</td></tr>");
-            console.log(data)
             $("#table_id_enrollmentClass").DataTable().rows.add(data);
-            console.log('test')
             $("#table_id_enrollmentClass").DataTable().draw();
             $("#table_id_teacher_wrapper").hide();
             $("#table_id_course-subject_wrapper").hide();
             $("#table_id_enrollmentClass").show();
+            handleExport()
         }
 
     }
 }
+function handleExport(stt) {
+    var mark = Marks.getData(stt)
+    console.log(mark)
+}
 function test() {
-    alert("oke")
+    $.ajax({
+        method: 'post',
+        url: '../Mark/test',
+        dataType: 'json',
+        data: {
+            subject_id: 1,
+            school_year_id_start: 1,
+            school_year_id_end: 2,
+            enrolmentClassID:180
+        },
+        success: function (data) {
+            console.log(data)
+        }
+    })
 }
 function fillDataToChart(list,type) {
     let typeChart = 'horizontalBar';

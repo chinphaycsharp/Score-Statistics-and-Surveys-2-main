@@ -155,6 +155,7 @@ namespace PhoDiem_TLU.DatabaseIO
                           {
                                 enrollmentClassID = enrollmentClass.id,
                                 enrollmentClassName = enrollmentClass.className,
+                                subjectID = subject.id,
                                 subjectName = subject.subject_name,
                                 mark = studentMark.mark
                           }).ToList();
@@ -166,6 +167,7 @@ namespace PhoDiem_TLU.DatabaseIO
                           {
                               enrollmentClassID = listGroup.Key,
                               enrollmentClassName = sublist.enrollmentClassName,
+                              subjectID = sublist.subjectID,
                               subjectName = sublist.subjectName,
                               Tong = listGroup.Count(),
                               A = listGroup.Count(x => x.mark >= 8.45 && x.mark <= 10),
@@ -175,7 +177,10 @@ namespace PhoDiem_TLU.DatabaseIO
                               F = listGroup.Count(x => x.mark >= 0 && x.mark < 3.95)
 
                           }
-                          ).Distinct().ToList().Select(x => new MarksByEnrollmentClass(0,x.subjectName,x.enrollmentClassName,x.Tong,
+                          ).Distinct().ToList().Select(x => new MarksByEnrollmentClass(0,x.subjectID,x.subjectName,x.enrollmentClassID,x.enrollmentClassName,
+                              school_year_id_start,
+                              school_year_id_end,
+                              x.Tong,
                               x.A,
                               Math.Round((double)x.A * 100 / x.Tong, 2),
                               x.B, 
@@ -183,6 +188,81 @@ namespace PhoDiem_TLU.DatabaseIO
                               x.C, 
                               Math.Round((double)x.C * 100 / x.Tong, 2),
                               x.D, 
+                              Math.Round((double)x.D * 100 / x.Tong, 2),
+                              x.F,
+                              Math.Round((double)x.F * 100 / x.Tong, 2)
+
+                          )).ToList();
+
+            int i = 1;
+            foreach (MarksByEnrollmentClass item in result)
+            {
+                item.stt = i++;
+            }
+            return result;
+        }
+        public List<MarksByEnrollmentClass> getMarksEnrollmentClass(long? subject_id, long? school_year_id_start, long? school_year_id_end, long subject_exam_type_id,
+            long? enrolmentClassID)
+        {
+            var listStudent = (from schoolYear in models.tbl_shool_year
+                               join enrollmentClass in models.tbl_enrollment_class
+                               on schoolYear.year equals enrollmentClass.schoolYear
+
+                               join student in models.tbl_student
+                               on enrollmentClass.id equals student.class_id
+
+                               join studentMark in models.tbl_student_mark
+                               on student.id equals studentMark.student_id
+
+                               join subject in models.tbl_subject
+                               on studentMark.subject_id equals subject.id
+
+                               join subjectExam in models.tbl_subject_exam
+                               on studentMark.subject_exam_id equals subjectExam.id
+
+                               where schoolYear.id >= school_year_id_start && schoolYear.id <= school_year_id_end
+                               && subject.id == subject_id
+                               && subjectExam.subject_exam_type_id == subject_exam_type_id
+                               && enrollmentClass.id == enrolmentClassID
+                               select new
+                               {
+                                   enrollmentClassID = enrollmentClass.id,
+                                   enrollmentClassName = enrollmentClass.className,
+                                   subjectID = subject.id,
+                                   subjectName = subject.subject_name,
+                                   schoolYearID = schoolYear.id,
+                                   mark = studentMark.mark
+                               }).ToList();
+            var result = (from list in listStudent
+                          group list by list.schoolYearID into listGroup
+                          from sublist in listStudent
+                          where listGroup.Key == sublist.schoolYearID
+                          select new
+                          {
+                              schoolYearID = listGroup.Key,
+                              enrollmentClassID = sublist.enrollmentClassID,
+                              enrollmentClassName = sublist.enrollmentClassName,
+                              subjectID = sublist.subjectID,
+                              subjectName = sublist.subjectName,
+                              Tong = listGroup.Count(),
+                              A = listGroup.Count(x => x.mark >= 8.45 && x.mark <= 10),
+                              B = listGroup.Count(x => x.mark >= 6.95 && x.mark < 8.45),
+                              C = listGroup.Count(x => x.mark >= 5.45 && x.mark < 6.95),
+                              D = listGroup.Count(x => x.mark >= 3.95 && x.mark < 5.45),
+                              F = listGroup.Count(x => x.mark >= 0 && x.mark < 3.95)
+
+                          }
+                          ).Distinct().ToList().Select(x => new MarksByEnrollmentClass(0, x.subjectID, x.subjectName, x.enrollmentClassID, x.enrollmentClassName,
+                              x.schoolYearID,
+                              null,
+                              x.Tong,
+                              x.A,
+                              Math.Round((double)x.A * 100 / x.Tong, 2),
+                              x.B,
+                              Math.Round((double)x.B * 100 / x.Tong, 2),
+                              x.C,
+                              Math.Round((double)x.C * 100 / x.Tong, 2),
+                              x.D,
                               Math.Round((double)x.D * 100 / x.Tong, 2),
                               x.F,
                               Math.Round((double)x.F * 100 / x.Tong, 2)

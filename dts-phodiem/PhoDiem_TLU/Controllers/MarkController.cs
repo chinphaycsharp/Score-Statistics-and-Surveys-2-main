@@ -41,7 +41,7 @@ namespace PhoDiem_TLU.Controllers
             listOption.Add(new SelectListItem() { Text = "Điểm quá trình", Value = "Điểm quá trình" });
             listOption.Add(new SelectListItem() { Text = "Điểm thi", Value = "Điểm thi" });
             listOption.Add(new SelectListItem() { Text = "Điểm tổng kết", Value = "Điểm tổng kết" });
-            SelectList showOption = new SelectList(provinces,"Value","Text");
+            SelectList showOption = new SelectList(provinces, "Value", "Text");
             SelectList markOption = new SelectList(listOption, "Value", "Text");
             SelectList s = new SelectList(subject, "id", "subject_name");
             SelectList y = new SelectList(years, "id", "year");
@@ -51,10 +51,10 @@ namespace PhoDiem_TLU.Controllers
             ViewBag.markOption = markOption;
         }
         [HttpPost]
-        
-        public JsonResult MarkResult(long? subject_id, long? school_year_id_start, long? school_year_id_end,string showoption,string markOption)
+
+        public JsonResult MarkResult(long? subject_id, long? school_year_id_start, long? school_year_id_end, string showoption, string markOption)
         {
-            
+
             try
             {
 
@@ -64,8 +64,8 @@ namespace PhoDiem_TLU.Controllers
                     if (showoption == "HTN")
                     {
                         List<StudentCourseSubject> studentCourseSubjects = dBIO.getMarks_2(subject_id, school_year_id_start, school_year_id_end);
-                        
-                        if(markOption == "Điểm quá trình")
+
+                        if (markOption == "Điểm quá trình")
                         {
                             var data = dBIO.getCourseSubjectData(studentCourseSubjects, 2);
                             var sumMark = dBIO.getSumMarks(data);
@@ -107,14 +107,14 @@ namespace PhoDiem_TLU.Controllers
                                 sumMark = sumMark
 
                             }, JsonRequestBehavior.AllowGet);
-                            
+
                         }
                     }
                     else if (showoption == "HTGV")
                     {
                         List<StudentCourseSubject> studentCourseSubjects = dBIO.getMarks_2(subject_id, school_year_id_start, school_year_id_end);
 
-                        if(markOption == "Điểm quá trình")
+                        if (markOption == "Điểm quá trình")
                         {
 
                             var data = dBIO.getMarkByTeacher(studentCourseSubjects, 2);
@@ -156,7 +156,7 @@ namespace PhoDiem_TLU.Controllers
                                 sumMark = sumMark
 
                             }, JsonRequestBehavior.AllowGet);
-                            
+
                         }
                     }
                     else //Diem theo lop quan ly
@@ -213,10 +213,10 @@ namespace PhoDiem_TLU.Controllers
                 log.Error(e.Message);
                 return Json(new { code = 404, msg = e.Message }, JsonRequestBehavior.AllowGet);
             }
-            
+
             return Json(new { code = 404 }, JsonRequestBehavior.AllowGet);
         }
-        
+
         [HttpPost]
         public ActionResult Export(long? subject_id, long? school_year_id_start, long? school_year_id_end, string showoption, string markOption)
         {
@@ -296,6 +296,22 @@ namespace PhoDiem_TLU.Controllers
                 }
             }
             else return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public JsonResult test(long? subject_id, long? school_year_id_start, long? school_year_id_end,
+            long? enrolmentClassID)
+        {
+            try
+            {
+                var list = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start,school_year_id_end, 2, enrolmentClassID);
+                return Json(new {list},JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return Json(new {code = 500},JsonRequestBehavior.AllowGet);
+            }
         }
         [HttpPost]
         public ActionResult ExportMarkByTeacher(int teacher, int semester, int courseYear, string markOption)
