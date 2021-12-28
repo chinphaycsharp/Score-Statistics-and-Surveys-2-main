@@ -78,12 +78,17 @@ namespace PhoDiem_TLU.Controllers
                 dynamic list;
                 if (type == "1") {
                     list = (from s in dbSet.tbl_course_subject
-                                       where s.semester_subject_id == subject.id
-                                       select new
-                                       {
-                                           id = s.id,
-                                           name = s.display_name
-                                       }).ToList();
+                            join class_student in dbSet.tbl_student_course_subject
+                            on s.id equals class_student.course_subject_id
+                            join student in dbSet.tbl_student
+                            on class_student.student_id equals student.id
+                            where s.semester_subject_id == subject.id
+                            select new
+                            {
+                                id = s.id,
+                                name = s.display_name
+                            }).Distinct().ToList();
+
                 }
                 else
                 {
@@ -186,7 +191,7 @@ namespace PhoDiem_TLU.Controllers
             }
         }
 
-        public JsonResult GetMark(string id, string type, string subject, string semester)
+        public JsonResult GetMark(List<string> listId, string type, string subject, string semester)
         {
             try
             {
@@ -195,47 +200,62 @@ namespace PhoDiem_TLU.Controllers
                 int[] list_mark_QT = { 0, 0, 0, 0, 0 };
 
                 var list_result = new List<MarkBySemester>();
-                if (id != null && id != "")
+                if (listId != null && listId.Count != 0)
                 {
-                    if (type == "1")
+                    foreach(var id in listId)
                     {
-                        long _id = long.Parse(id);
-                        long _subject = long.Parse(subject);
-                        long _semester = long.Parse(semester);
+                        if (type == "1")
+                        {
+                            long _id = long.Parse(id);
+                            long _subject = long.Parse(subject);
+                            long _semester = long.Parse(semester);
 
-                        list_result = data.GetMarkBySemester(_id, _subject, _semester);
-                    }
-                    else
-                    {
-                        long _id = long.Parse(id);
-                        long _subject = long.Parse(subject);
-                        long _semester = long.Parse(semester);
+                            list_result.AddRange(data.GetMarkBySemester(_id, _subject, _semester));
+                        }
+                        else
+                        {
+                            long _id = long.Parse(id);
+                            long _subject = long.Parse(subject);
+                            long _semester = long.Parse(semester);
 
-                        list_result = data.GetMarkByClass(_id, _subject, _semester);
+                            list_result.AddRange(data.GetMarkByClass(_id, _subject, _semester));
+                        }
                     }
                 }
 
                 foreach (var item in list_result)
                 {
-                    if (getCharMark((double)item.mark_exam) == 0) list_mark[0]++;
-                    else if (getCharMark((double)item.mark_exam) == 1) list_mark[1]++;
-                    else if (getCharMark((double)item.mark_exam) == 2) list_mark[2]++;
-                    else if (getCharMark((double)item.mark_exam) == 3) list_mark[3]++;
+                    if (item.status != 0) continue;
+                    if (getCharMark(double.Parse(item.mark_exam)) == 0) list_mark[0]++;
+                    else if (getCharMark(double.Parse(item.mark_exam)) == 1) list_mark[1]++;
+                    else if (getCharMark(double.Parse(item.mark_exam)) == 2) list_mark[2]++;
+                    else if (getCharMark(double.Parse(item.mark_exam)) == 3) list_mark[3]++;
                     else list_mark[4]++;
 
-                    if (getCharMark((double)item.mark) == 0) list_mark_QT[0]++;
-                    else if (getCharMark((double)item.mark) == 1) list_mark_QT[1]++;
-                    else if (getCharMark((double)item.mark) == 2) list_mark_QT[2]++;
-                    else if (getCharMark((double)item.mark) == 3) list_mark_QT[3]++;
+                    if (getCharMark(double.Parse(item.mark)) == 0) list_mark_QT[0]++;
+                    else if (getCharMark(double.Parse(item.mark)) == 1) list_mark_QT[1]++;
+                    else if (getCharMark(double.Parse(item.mark)) == 2) list_mark_QT[2]++;
+                    else if (getCharMark(double.Parse(item.mark)) == 3) list_mark_QT[3]++;
                     else list_mark_QT[4]++;
 
-                    if (getCharMark((double)item.mark_final) == 0) list_mark_final[0]++;
-                    else if (getCharMark((double)item.mark_final) == 1) list_mark_final[1]++;
-                    else if (getCharMark((double)item.mark_final) == 2) list_mark_final[2]++;
-                    else if (getCharMark((double)item.mark_final) == 3) list_mark_final[3]++;
+                    if (getCharMark(double.Parse(item.mark_final)) == 0) list_mark_final[0]++;
+                    else if (getCharMark(double.Parse(item.mark_final)) == 1) list_mark_final[1]++;
+                    else if (getCharMark(double.Parse(item.mark_final)) == 2) list_mark_final[2]++;
+                    else if (getCharMark(double.Parse(item.mark_final)) == 3) list_mark_final[3]++;
                     else list_mark_final[4]++;
                 }
-                return Json(new { code = 200, data = list_result, chart_mark = new { qt = list_mark_QT, exam = list_mark, final = list_mark_final } }, JsonRequestBehavior.AllowGet);
+                return Json(new { code = 200, data = list_result.Select(
+                    s=>new { 
+                        s.class_name,
+                        s.student_code,
+                        s.student_name,
+                        s.mark,
+                        s.mark_exam,
+                        s.mark_final,
+                        s.gpa,
+                        s.mark_gpa,
+                        s.note
+                }), chart_mark = new { qt = list_mark_QT, exam = list_mark, final = list_mark_final } }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception e)
             {

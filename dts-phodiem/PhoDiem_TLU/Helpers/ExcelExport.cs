@@ -4,6 +4,7 @@ using PhoDiem_TLU.DatabaseIO;
 using PhoDiem_TLU.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -103,6 +104,29 @@ namespace PhoDiem_TLU.Helpers
                         workSheet.Cells[y, 8].Value = temp.ElementAt(i - 1).gpa;
                         workSheet.Cells[y, 9].Value = temp.ElementAt(i - 1).mark_gpa;
                         workSheet.Cells[y, 10].Value = temp.ElementAt(i - 1).note;
+                        //if (temp.ElementAt(i-1).status != 0)
+                        //{
+                        //    workSheet.Cells[y, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 1].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 2].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 3].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 4].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 4].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 5].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 6].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 6].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 7].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 7].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 8].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 9].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 9].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 10].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 10].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //}
                     }
 
                     int row_max = temp.Count + 11;
@@ -120,11 +144,14 @@ namespace PhoDiem_TLU.Helpers
                     int cF = 0;
                     foreach (var s in temp)
                     {
-                        if (s.mark_exam <= 10 && s.mark_exam >= 8.45) cA++;
-                        if (s.mark_exam <= 8.44 && s.mark_exam >= 6.95) cB++;
-                        if (s.mark_exam <= 6.94 && s.mark_exam >= 5.45) cC++;
-                        if (s.mark_exam <= 5.44 && s.mark_exam >= 3.95) cD++;
-                        if (s.mark_exam < 3.95) cF++;
+                        if(s.status == 0)
+                        {
+                            if (double.Parse(s.mark_exam) <= 10 && double.Parse(s.mark_exam) >= 8.45) cA++;
+                            if (double.Parse(s.mark_exam) <= 8.44 && double.Parse(s.mark_exam) >= 6.95) cB++;
+                            if (double.Parse(s.mark_exam) <= 6.94 && double.Parse(s.mark_exam) >= 5.45) cC++;
+                            if (double.Parse(s.mark_exam) <= 5.44 && double.Parse(s.mark_exam) >= 3.95) cD++;
+                            if (double.Parse(s.mark_exam) < 3.95) cF++;
+                        }
                     }
 
                     workSheet.Cells["A" + (row_max + 3)].Value = "A";
@@ -260,6 +287,29 @@ namespace PhoDiem_TLU.Helpers
                         workSheet.Cells[y, 8].Value = temp.ElementAt(i - 1).gpa;
                         workSheet.Cells[y, 9].Value = temp.ElementAt(i - 1).mark_gpa;
                         workSheet.Cells[y, 10].Value = temp.ElementAt(i - 1).note;
+                        //if (temp.ElementAt(i-1).status != 0)
+                        //{
+                        //    workSheet.Cells[y, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 1].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 2].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 3].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 4].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 4].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 5].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 6].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 6].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 7].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 7].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 8].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 9].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 9].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //    workSheet.Cells[y, 10].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //    workSheet.Cells[y, 10].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
+                        //}
                     }
 
                     int row_max = temp.Count + 11;
@@ -270,11 +320,14 @@ namespace PhoDiem_TLU.Helpers
                     int cF = 0;
                     foreach (var s in temp)
                     {
-                        if (s.mark_exam <= 10 && s.mark_exam >= 8.45) cA++;
-                        if (s.mark_exam <= 8.44 && s.mark_exam >= 6.95) cB++;
-                        if (s.mark_exam <= 6.94 && s.mark_exam >= 5.45) cC++;
-                        if (s.mark_exam <= 5.44 && s.mark_exam >= 3.95) cD++;
-                        if (s.mark_exam < 3.95) cF++;
+                        if (s.status == 0)
+                        {
+                            if (double.Parse(s.mark_exam) <= 10 && double.Parse(s.mark_exam) >= 8.45) cA++;
+                            if (double.Parse(s.mark_exam) <= 8.44 && double.Parse(s.mark_exam) >= 6.95) cB++;
+                            if (double.Parse(s.mark_exam) <= 6.94 && double.Parse(s.mark_exam) >= 5.45) cC++;
+                            if (double.Parse(s.mark_exam) <= 5.44 && double.Parse(s.mark_exam) >= 3.95) cD++;
+                            if (double.Parse(s.mark_exam) < 3.95) cF++;
+                        }
                     }
 
                     workSheet.Cells["A" + (row_max + 3)].Value = "A";

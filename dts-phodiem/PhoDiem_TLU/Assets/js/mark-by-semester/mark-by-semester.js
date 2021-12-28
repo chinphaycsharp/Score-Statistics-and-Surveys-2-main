@@ -89,8 +89,6 @@ function getClass(type) {
                                     <label class="checkbox-wrap">
                                         <input id="${response.data[i].id}" onclick="oncheck(this)" type="checkbox">
                                         <span for="AL">${response.data[i].name}</span> <span class="checkmark"></span>
-                                        &nbsp<span type="${response.name}" value="${response.data[i].id}" class="fas fa-eye show-class" onclick="showClass(this)"></span>
-                                        &nbsp<span type="${response.name}" value="${response.data[i].id}" class="fas fa-download download-class" onclick="download(this)"></span>
                                     </label>
                                  </li>`;
                         temp.append(k)
@@ -136,14 +134,13 @@ function download(download) {
 
 function change(res, type) {
     show('');
-    value.value = res;
     $("#_loading").show();
     $("#main_content").hide();
     $.ajax({
         url: '/Semester/GetMark',
         dataType: "json",
         type: 'POST',
-        data: { id: value.value, type: type, subject: value.subject, semester: value.semester },
+        data: { listId: [...listClass], type: value.type, subject: value.subject, semester: value.semester },
         error: function (xhr, ajaxOptions, thrownError) {
             console.log(xhr);
             console.log(ajaxOptions);
@@ -219,47 +216,47 @@ function setFillter() {
     event.preventDefault(); // <- avoid reloading
 }
 
-function xuat1(id) {
-    $.ajax({
-        type: "POST",
-        url: "/Semester/Export",
-        data: {
-            type: value.type,
-            subject: value.subject,
-            semester: value.semester,
-            data: id
-        },
-        error: function (a, b, c) {
-            console.log(a);
-            console.log(b);
-        },
-    }).done(function (r) {
-        if (r.code == 200) {
-            //Convert Base64 string to Byte Array.
-            var bytes = Base64ToBytes(r.data);
+//function xuat1(id) {
+//    $.ajax({
+//        type: "POST",
+//        url: "/Semester/Export",
+//        data: {
+//            type: value.type,
+//            subject: value.subject,
+//            semester: value.semester,
+//            data: id
+//        },
+//        error: function (a, b, c) {
+//            console.log(a);
+//            console.log(b);
+//        },
+//    }).done(function (r) {
+//        if (r.code == 200) {
+//            //Convert Base64 string to Byte Array.
+//            var bytes = Base64ToBytes(r.data);
 
-            //Convert Byte Array to BLOB.
-            var blob = new Blob([bytes], { type: "application/octetstream/xlsx" });
+//            //Convert Byte Array to BLOB.
+//            var blob = new Blob([bytes], { type: "application/octetstream/xlsx" });
 
-            //Check the Browser type and download the File.
-            var isIE = false || !!document.documentMode;
-            if (isIE) {
-                window.navigator.msSaveBlob(blob, r.name);
-            } else {
-                var url = window.URL || window.webkitURL;
-                link = url.createObjectURL(blob);
-                var a = $("<a />");
-                a.attr("download", r.name);
-                a.attr("href", link);
-                $("body").append(a);
-                a[0].click();
-                $("body").remove(a);
-            }
+//            //Check the Browser type and download the File.
+//            var isIE = false || !!document.documentMode;
+//            if (isIE) {
+//                window.navigator.msSaveBlob(blob, r.name);
+//            } else {
+//                var url = window.URL || window.webkitURL;
+//                link = url.createObjectURL(blob);
+//                var a = $("<a />");
+//                a.attr("download", r.name);
+//                a.attr("href", link);
+//                $("body").append(a);
+//                a[0].click();
+//                $("body").remove(a);
+//            }
 
-        }
-        else console.log(r.mgs);
-    });
-}
+//        }
+//        else console.log(r.mgs);
+//    });
+//}
 function xuat() {
     $.ajax({
         type: "POST",
