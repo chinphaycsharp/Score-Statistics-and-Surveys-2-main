@@ -1,15 +1,10 @@
-﻿
-
-
-$(document).ready(function () {
+﻿$(document).ready(function () {
     var ok = false;
     var dataMark = null;
     handlefilter();
     var table = $("#table_id_course-subject").DataTable({
         "processing": true,
     });
-    console.log("OK")
-    test()
         
 })
 const Marks = (function (){
@@ -53,10 +48,11 @@ $('form').submit(function (even) {
                 if (response.code == 200) {
                     dataMark = response.data;
                     Marks.setData(response.data)
-                    fillDataToChart(response.data, response.type);
+                    fillDataToChart(response.data, response.showoption);
                     fillDataToChartPie(response.sumMark);
                     ok = true;
-                    showHandler(response.type);
+                    
+                    showHandler(response.showoption, response.markOption)
                 }
                 else {
                     console.log(reponse.sublist);
@@ -72,11 +68,11 @@ $('form').submit(function (even) {
             
     })
 }
-function showHandler(val) {
-    console.log(val);
+function showHandler(showOption, markOption) {
+    console.log(showOption, markOption)
     if (dataMark != null) {
         console.log(dataMark)
-        if (val === "HTN") {
+        if (showOption === "HTN") {
             data = dataMark.map(Object.values)
             $("#table_id_course-subject").DataTable().clear();
             $("#table_id_course-subject").DataTable().rows.add(data);
@@ -85,10 +81,14 @@ function showHandler(val) {
             $("#table_id_teacher_wrapper").hide();
             $("#table_id_enrollmentClass_wrapper").hide();
         }
-        else if (val === "HTGV") {
-            var data = dataMark.map(data => {
-                var { courseSubjectName, ...newData } = data
-                return newData
+        else if (showOption === "HTGV") {
+            var marks = Marks.getAllData()
+            var data = marks.map(data => {
+                var { stt, subjectName, teacherName, sum, A, rateA, B, rateB, C, rateC, D, rateD, F, rateF } = data
+                return {
+                    stt, subjectName, teacherName, sum, A, rateA, B, rateB, C, rateC, D, rateD, F, rateF,
+                    'button': `<button onclick= "handleExportTeacher(${stt},'${markOption}')" class="download export"><i class="fa fa-download" aria-hidden="true"></i></button>`
+                }
             })
 
             data = data.map(Object.values)
@@ -104,8 +104,8 @@ function showHandler(val) {
             var data = marks.map(data => {
                 var { stt, subjectName, enrollmentClassName, sumMark, A,rateA,B,rateB,C,rateC,D,rateD,F,rateF} = data
                 return {
-                    stt, subjectName, enrollmentClassName, sumMark, A, rateA, B, rateB, C, rateC, D, rateD, F,rateF,
-                    'button':`<button onclick= "handleExport(${stt})" class="download export"><i class="fa fa-download" aria-hidden="true"></i></button>`
+                    stt, subjectName, enrollmentClassName, sumMark, A, rateA, B, rateB, C, rateC, D, rateD, F, rateF,
+                    'button': `<button onclick= "handleExportEnrollmentClass(${stt},'${markOption}')" class="download export"><i class="fa fa-download" aria-hidden="true"></i></button>`
                 }
             })
            
@@ -116,30 +116,68 @@ function showHandler(val) {
             $("#table_id_teacher_wrapper").hide();
             $("#table_id_course-subject_wrapper").hide();
             $("#table_id_enrollmentClass").show();
-            handleExport()
         }
 
     }
 }
-function handleExport(stt) {
+function handleExportTeacher(stt, markOption) {
+    var mark = Marks.getData(stt)
+    console.log(mark.subjectID, mark.startYearID, mark.endYearID, mark.teacherID, markOption)
+    $.post("../Mark/ExportFileTeacher", {
+        subject_id: mark.subjectID,
+        school_year_id_start: mark.startYearID,
+        school_year_id_end: mark.endYearID,
+        teacherID: mark.teacherID,
+        markOption: markOption
+    }, function (data) {
+        if (data.code == 200) {
+            var bytes = Base64ToBytes(data.result)
+            var a = window.document.createElement('a')
+
+            a.href = window.URL.createObjectURL(new Blob([bytes], { type: 'application/xlsx' }))
+
+            a.download = `${data.fileName}`
+
+            document.body.appendChild(a)
+            a.click();
+            document.body.removeChild(a)
+        }
+        else alert("Lỗi khi xuất file")
+    })
+}
+function handleExportEnrollmentClass(stt,markOption) {
+    
     var mark = Marks.getData(stt)
     console.log(mark)
-}
-function test() {
-    $.ajax({
-        method: 'post',
-        url: '../Mark/test',
-        dataType: 'json',
-        data: {
-            subject_id: 1,
-            school_year_id_start: 1,
-            school_year_id_end: 2,
-            enrolmentClassID:180
-        },
-        success: function (data) {
-            console.log(data)
+    $.post("../Mark/ExportFileEnrollmentClass", {
+        subject_id: mark.subjectID,
+        school_year_id_start: mark.startYear,
+        school_year_id_end: mark.endYear,
+        enrollmentClassID: mark.enrollmentClassID,
+        markOption: markOption
+    }, function (data) {
+        if (data.code == 200) {
+            var bytes = Base64ToBytes(data.result)
+            var a = window.document.createElement('a')
+
+            a.href = window.URL.createObjectURL(new Blob([bytes], { type: 'application/xlsx' }))
+
+            a.download = `${data.fileName}`
+
+            document.body.appendChild(a)
+            a.click();
+            document.body.removeChild(a)
         }
+        else alert("Lỗi khi xuất file")
     })
+}
+function Base64ToBytes(base64) {
+    var s = window.atob(base64)
+    var bytes = new Uint8Array(s.length)
+    for (var i = 0; i < s.length; ++i) {
+        bytes[i] = s.charCodeAt(i);
+    }
+    return bytes;
 }
 function fillDataToChart(list,type) {
     let typeChart = 'horizontalBar';

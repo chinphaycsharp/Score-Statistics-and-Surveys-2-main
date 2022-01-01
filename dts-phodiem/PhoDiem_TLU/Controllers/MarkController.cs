@@ -74,9 +74,10 @@ namespace PhoDiem_TLU.Controllers
                             return Json(new
                             {
                                 code = 200,
-                                data = data,
-                                type = showoption,
-                                sumMark = sumMark
+                                data,
+                                showoption,
+                                markOption,
+                                sumMark,
 
                             }, JsonRequestBehavior.AllowGet);
                         }
@@ -87,9 +88,10 @@ namespace PhoDiem_TLU.Controllers
                             return Json(new
                             {
                                 code = 200,
-                                data = data,
-                                type = showoption,
-                                sumMark = sumMark
+                                data,
+                                showoption,
+                                markOption,
+                                sumMark,
 
                             }, JsonRequestBehavior.AllowGet);
                         }
@@ -102,9 +104,10 @@ namespace PhoDiem_TLU.Controllers
                             return Json(new
                             {
                                 code = 200,
-                                data = data,
-                                type = showoption,
-                                sumMark = sumMark
+                                data,
+                                showoption,
+                                markOption,
+                                sumMark,
 
                             }, JsonRequestBehavior.AllowGet);
 
@@ -122,9 +125,10 @@ namespace PhoDiem_TLU.Controllers
                             return Json(new
                             {
                                 code = 200,
-                                data = data,
-                                type = showoption,
-                                sumMark = sumMark
+                                data,
+                                showoption,
+                                markOption,
+                                sumMark,
 
                             }, JsonRequestBehavior.AllowGet);
                         }
@@ -136,9 +140,10 @@ namespace PhoDiem_TLU.Controllers
                             return Json(new
                             {
                                 code = 200,
-                                data = data,
-                                type = showoption,
-                                sumMark = sumMark
+                                data,
+                                showoption,
+                                markOption,
+                                sumMark,
 
                             }, JsonRequestBehavior.AllowGet);
                         }
@@ -146,14 +151,15 @@ namespace PhoDiem_TLU.Controllers
                         {
                             var list = dBIO.getMarks(subject_id, school_year_id_start, school_year_id_end);
                             var sublist = dBIO.getCourseSubjectData(list);
-                            var data = dBIO.getMarkByTeacher(sublist);
+                            var data = dBIO.getMarkByTeacher(list);
                             var sumMark = dBIO.getSumMarks(data);
                             return Json(new
                             {
                                 code = 200,
-                                data = data,
-                                type = showoption,
-                                sumMark = sumMark
+                                data,
+                                showoption,
+                                markOption,
+                                sumMark,
 
                             }, JsonRequestBehavior.AllowGet);
 
@@ -170,9 +176,10 @@ namespace PhoDiem_TLU.Controllers
                             return Json(new
                             {
                                 code = 200,
-                                data = data,
-                                type = showoption,
-                                sumMark = sumMark
+                                data,
+                                showoption,
+                                markOption,
+                                sumMark,
 
                             }, JsonRequestBehavior.AllowGet);
                         }
@@ -183,9 +190,10 @@ namespace PhoDiem_TLU.Controllers
                             return Json(new
                             {
                                 code = 200,
-                                data = data,
-                                type = showoption,
-                                sumMark = sumMark
+                                data,
+                                showoption,
+                                markOption,
+                                sumMark,
 
                             }, JsonRequestBehavior.AllowGet);
                         }
@@ -197,9 +205,10 @@ namespace PhoDiem_TLU.Controllers
                             return Json(new
                             {
                                 code = 200,
-                                data = data,
-                                type = showoption,
-                                sumMark = sumMark
+                                data,
+                                showoption,
+                                markOption,
+                                sumMark,
 
                             }, JsonRequestBehavior.AllowGet);
 
@@ -266,10 +275,11 @@ namespace PhoDiem_TLU.Controllers
                     {
                         var list = dBIO.getMarks(subject_id, school_year_id_start, school_year_id_end);
                         var sublist = dBIO.getCourseSubjectData(list);
-                        dataMark = dBIO.getMarkByTeacher(sublist);
+                        dataMark = dBIO.getMarkByTeacher(list);
+                        
                     }
                     var fileName = $"{markOption}_{subjectName}_{startYear}-{EndYear}.xlsx";
-                    var data = ex.ExportExcelDataTeacher(markOption, subjectName, numberOfCredit, startYear, EndYear, dataMark);
+                    var data = ex.ExportExcelDataTeacher(markOption, subjectName, numberOfCredit, startYear, EndYear, dataMark,1);
                     return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
 
                 }
@@ -299,19 +309,116 @@ namespace PhoDiem_TLU.Controllers
         }
 
         [HttpPost]
-        public JsonResult test(long? subject_id, long? school_year_id_start, long? school_year_id_end,
-            long? enrolmentClassID)
+        public JsonResult ExportFileEnrollmentClass(long? subject_id, long? school_year_id_start, long? school_year_id_end,
+            long? enrollmentClassID,string markOption)
         {
             try
             {
-                var list = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start,school_year_id_end, 2, enrolmentClassID);
-                return Json(new {list},JsonRequestBehavior.AllowGet);
+                List<MarksByEnrollmentClass> dataMark;
+                long startYear = dBIO.getYear(school_year_id_start);
+                long EndYear = dBIO.getYear(school_year_id_end);
+                string subjectName = dBIO.getSubject(subject_id);
+                long numberOfCredit = dBIO.getNumberOfCredit(subject_id);
+                string enrollmentClassName = dBIO.getEnrollmentClassName(enrollmentClassID);
+                if (markOption == "Điểm quá trình")
+                {
+                    dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end, 2, enrollmentClassID);
+                }
+                else if (markOption == "Điểm thi")
+                {
+                    dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end, 3, enrollmentClassID);
+                }
+                else
+                {
+                    //Diem tong ket
+                    dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end,enrollmentClassID);
+
+                }
+                var fileName = $"{markOption}_{subjectName}_{enrollmentClassName}_{startYear}-{EndYear}.xlsx";
+                var data = ex.ExportExcelDataEnrollmentClass(markOption, subjectName, numberOfCredit, enrollmentClassName, startYear, EndYear, dataMark);
+                return Json(new {code = 200,fileName,enrollmentClassID, result = Convert.ToBase64String(data) },JsonRequestBehavior.AllowGet);
+                //return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch(Exception ex)
+            {
+                return Json(new { code = 500, }, JsonRequestBehavior.AllowGet);
+            }
+
+        }
+        [HttpPost]
+        public JsonResult ExportFileTeacher(long? subject_id, long? school_year_id_start, long? school_year_id_end,
+            long? teacherID, string markOption)
+        {
+            try
+            {
+                List<StudentCourseSubject> studentCourseSubjects
+                        = dBIO.getMarks_2(subject_id, school_year_id_start, school_year_id_end,teacherID);
+                List<MarkRate> dataMark;
+                long startYear = dBIO.getYear(school_year_id_start);
+                long EndYear = dBIO.getYear(school_year_id_end);
+                string subjectName = dBIO.getSubject(subject_id);
+                string teacherName = dBIO.getTeacherName(teacherID);
+                long numberOfCredit = dBIO.getNumberOfCredit(subject_id);
+                if (markOption == "Điểm thi")
+                {
+                    dataMark = dBIO.getMarkByTeacher(studentCourseSubjects,teacherID, 3);
+                }
+                else if (markOption == "Điểm quá trình")
+                {
+                    dataMark = dBIO.getMarkByTeacher(studentCourseSubjects,teacherID, 2);
+                }
+                else
+                {
+                    var list = dBIO.getMarks(subject_id, school_year_id_start, school_year_id_end,teacherID);
+                    dataMark = dBIO.getMarkByTeacher(list,teacherID);
+                }
+                var fileName = $"{markOption}_{subjectName}_{teacherName}_{startYear}-{EndYear}.xlsx";
+                var data = ex.ExportExcelDataTeacher(markOption, subjectName, numberOfCredit, startYear, EndYear, dataMark,2);
+                return Json(new { code = 200, fileName, result = Convert.ToBase64String(data) }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
-                log.Error(ex.Message);
-                return Json(new {code = 500},JsonRequestBehavior.AllowGet);
+                return Json(new { code = 500, }, JsonRequestBehavior.AllowGet);
             }
+
+        }
+        [HttpPost]
+        public ActionResult test1(long? subject_id, long? school_year_id_start, long? school_year_id_end,
+            long? enrollmentClassID, string markOption)
+        {
+            
+            List<MarksByEnrollmentClass> dataMark;
+            long startYear = dBIO.getYear(school_year_id_start);
+            long EndYear = dBIO.getYear(school_year_id_end);
+            string subjectName = dBIO.getSubject(subject_id);
+            long numberOfCredit = dBIO.getNumberOfCredit(subject_id);
+            string enrollmentClassName = dBIO.getEnrollmentClassName(enrollmentClassID);
+            if (markOption == "DQT")
+            {
+                dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end, 2, enrollmentClassID);
+            }
+            else if (markOption == "DT")
+            {
+                dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end, 3, enrollmentClassID);
+            }
+            else
+            {
+                //Diem tong ket
+                dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end);
+
+            }
+            var fileName = $"{markOption}_{subjectName}_{enrollmentClassName}_{startYear}-{EndYear}.xlsx";
+            var data = ex.ExportExcelDataEnrollmentClass(markOption, subjectName, numberOfCredit, enrollmentClassName, startYear, EndYear, dataMark);
+            //return Json(new { code = 200, result = Convert.ToBase64String(data) }, JsonRequestBehavior.AllowGet);
+            return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            
+
+        }
+        [HttpGet]
+        public virtual ActionResult Download(byte[] file)
+        {
+            var fileName = "test.xlsx";
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
         [HttpPost]
         public ActionResult ExportMarkByTeacher(int teacher, int semester, int courseYear, string markOption)

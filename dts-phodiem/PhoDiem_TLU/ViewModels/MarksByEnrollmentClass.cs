@@ -47,6 +47,28 @@ namespace PhoDiem_TLU.ViewModels
             F = f;
             this.rateF = rateF;
         }
+        public MarksByEnrollmentClass(long stt, long? subjectID, string subjectName, long? enrollmentClassID,
+            string enrollmentClassName,long? year,
+            long sumMark, long a, double rateA, long b, double rateB, long c, double rateC, long d, double rateD, long f, double rateF)
+        {
+            this.stt = stt;
+            this.subjectID = subjectID;
+            this.subjectName = subjectName;
+            this.enrollmentClassID = enrollmentClassID;
+            this.enrollmentClassName = enrollmentClassName;
+            this.year = year;
+            this.sumMark = sumMark;
+            A = a;
+            this.rateA = rateA;
+            B = b;
+            this.rateB = rateB;
+            C = c;
+            this.rateC = rateC;
+            D = d;
+            this.rateD = rateD;
+            F = f;
+            this.rateF = rateF;
+        }
 
         public long stt { get; set; }
         public long? subjectID { get; set; }
@@ -55,6 +77,7 @@ namespace PhoDiem_TLU.ViewModels
         public string enrollmentClassName { get; set; }
         public long? startYear { get; set; }  
         public long? endYear { get; set; }
+        public long? year { get; set; }
         public long sumMark { get; set; }
 
         public long A { get; set; }

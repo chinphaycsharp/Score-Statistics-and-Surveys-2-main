@@ -61,19 +61,90 @@ namespace PhoDiem_TLU.DatabaseIO
                     {
                         semester = semester.id,
                         semesterName = semester.semester_name,
+                        subjectID = subject.id,
                         subjectName = subject.subject_name,
                         numberOfCredit= subject.number_of_credit,
                         couresSubjectID = couresSubject.id,
                         courseSubjectName = couresSubject.display_name,
+                        teacherID = couresSubject.teacher_id,
                         teacherName = person.display_name,
                         student_Mark = studentMark.mark,
-                        student_Subject_Mark = studentSubjectMark.mark4
-                    }).ToList().Select(s=> new Mark(s.semesterName, s.couresSubjectID, s.courseSubjectName,
-                s.teacherName, s.student_Mark, s.student_Subject_Mark,s.subjectName,s.numberOfCredit));
+                        student_Subject_Mark = studentSubjectMark.mark4,
+                        startYearID = school_year_id_start,
+                        endYearID = school_year_id_end,
+
+                    }).ToList().Select(s=> new Mark(s.teacherID,s.teacherName,s.student_Mark,s.student_Subject_Mark,
+                    s.subjectID,s.subjectName,s.numberOfCredit,s.startYearID,s.endYearID));
 
 
             return list.ToList();
         }
+        // Lấy thông tin điểm tổng kết sinh viên của một giáo viên trong nhiều năm
+        public List<Mark> getMarks(long? subject_id, long? school_year_id_start, long? school_year_id_end,long? teacherID)
+        {
+
+            var list = (
+                // lay hoc ki
+                from school in models.tbl_shool_year
+                join semester in models.tbl_semester
+                on school.id equals semester.school_year_id
+
+                //Lay hoc ki mon hoc
+                join semesterSubject in models.tbl_semester_subject
+                on semester.id equals semesterSubject.semester_id
+                join subject in models.tbl_subject
+                on semesterSubject.subject_id equals subject.id
+
+                //tim nhom lop
+                join couresSubject in models.tbl_course_subject
+                on semesterSubject.id equals couresSubject.semester_subject_id
+
+                // tim nhom lop sinh vien
+                join studentCourseSubject in models.tbl_student_course_subject
+                on couresSubject.id equals studentCourseSubject.course_subject_id
+
+                //Tim ten giao vien
+                join person in models.tbl_person
+                on couresSubject.teacher_id equals person.id
+                //tim diem tong ket
+                from studentSubjectMark in models.tbl_student_subject_mark
+
+
+                    //Tim nhom diem qua trinh
+                from studentMark in models.tbl_student_mark
+
+
+                    //
+                where school.id >= school_year_id_start && school.id <= school_year_id_end && subject.id == subject_id
+                && couresSubject.teacher_id == teacherID
+
+                //Tim diem
+                && studentSubjectMark.semester_id == semester.id
+                && studentSubjectMark.subject_id == subject.id
+                && studentMark.student_course_subject_id == studentCourseSubject.id
+                && studentMark.student_subject_mark_id == studentSubjectMark.id
+                select new
+                {
+                    semester = semester.id,
+                    semesterName = semester.semester_name,
+                    subjectID = subject.id,
+                    subjectName = subject.subject_name,
+                    numberOfCredit = subject.number_of_credit,
+                    couresSubjectID = couresSubject.id,
+                    courseSubjectName = couresSubject.display_name,
+                    teacherID = couresSubject.teacher_id,
+                    teacherName = person.display_name,
+                    student_Mark = studentMark.mark,
+                    student_Subject_Mark = studentSubjectMark.mark4,
+                    year = school.year
+
+                }).ToList().Select(s => new Mark(s.teacherID, s.teacherName, s.student_Mark, s.student_Subject_Mark,
+                s.subjectID, s.subjectName,s.year));
+
+
+            return list.ToList();
+        }
+        //Lấy điểm tất cả sinh viên theo nhiều giáo viên
         public List<StudentCourseSubject> getMarks_2(long? subject_id, long? school_year_id_start, long? school_year_id_end)
         {
 
@@ -114,17 +185,82 @@ namespace PhoDiem_TLU.DatabaseIO
                     subjectId = subject.id,
                     couresSubjectID = couresSubject.id,
                     courseSubjectName = couresSubject.display_name,
+                    teacherID = couresSubject.teacher_id,
                     teacherName = person.display_name,
                     subjectName = subject.subject_name,
                     numberOfCredit = subject.number_of_credit,
                     semesterID = semester.id,
                     semesterName = semester.semester_name,
                     subjectExamID = studentMark.subject_exam_id,
-                    studentSubjectMarkID = studentMark.student_subject_mark_id
+                    studentSubjectMarkID = studentMark.student_subject_mark_id,
+                    startYearID = school_year_id_start,
+                    endYearID = school_year_id_end
 
                 }
                 ).ToList().Select(x => new StudentCourseSubject(x.studentId,x.mark, x.subjectId,x.couresSubjectID,
-                x.courseSubjectName,x.teacherName,x.subjectName,x.numberOfCredit,x.semesterID, x.semesterName, x.subjectExamID,x.studentSubjectMarkID));
+                x.courseSubjectName,x.teacherID,
+                x.teacherName,x.subjectName,x.numberOfCredit,x.semesterID, x.semesterName, x.subjectExamID,x.studentSubjectMarkID,
+                x.startYearID,x.endYearID));
+
+
+            return list.ToList();
+        }
+        //Lấy điểm tất cả sinh viên của một giáo viên
+        public List<StudentCourseSubject> getMarks_2(long? subject_id, long? school_year_id_start, long? school_year_id_end,long? teacherID)
+        {
+
+            var list = (
+                // lay hoc ki
+                from school in models.tbl_shool_year
+                join semester in models.tbl_semester
+                on school.id equals semester.school_year_id
+
+                //Lay hoc ki mon hoc
+                join semesterSubject in models.tbl_semester_subject
+                on semester.id equals semesterSubject.semester_id
+                join subject in models.tbl_subject
+                on semesterSubject.subject_id equals subject.id
+
+                //tim nhom lop
+                join couresSubject in models.tbl_course_subject
+                on semesterSubject.id equals couresSubject.semester_subject_id
+
+                // tim nhom lop sinh vien
+                join studentCourseSubject in models.tbl_student_course_subject
+                on couresSubject.id equals studentCourseSubject.course_subject_id
+
+                //Tim ten giao vien
+                join person in models.tbl_person
+                on couresSubject.teacher_id equals person.id
+
+                //Tim nhom diem qua trinh
+                from studentMark in models.tbl_student_mark     //
+                where school.id >= school_year_id_start && school.id <= school_year_id_end && subject.id == subject_id
+                && studentMark.student_id == studentCourseSubject.student_id
+                && studentMark.subject_id == subject_id
+                && couresSubject.teacher_id == teacherID
+                select new
+                {
+                    studentId = studentMark.student_id,
+                    mark = studentMark.mark,
+                    subjectId = subject.id,
+                    couresSubjectID = couresSubject.id,
+                    courseSubjectName = couresSubject.display_name,
+                    teacherID = couresSubject.teacher_id,
+                    teacherName = person.display_name,
+                    subjectName = subject.subject_name,
+                    numberOfCredit = subject.number_of_credit,
+                    semesterID = semester.id,
+                    semesterName = semester.semester_name,
+                    subjectExamID = studentMark.subject_exam_id,
+                    studentSubjectMarkID = studentMark.student_subject_mark_id,
+                    year = school.year
+
+                }
+                ).ToList().Select(x => new StudentCourseSubject(x.studentId, x.mark, x.subjectId, x.couresSubjectID,
+                x.courseSubjectName, x.teacherID,
+                x.teacherName, x.subjectName, x.numberOfCredit, x.semesterID, x.semesterName, x.subjectExamID, x.studentSubjectMarkID,
+                x.year));
 
 
             return list.ToList();
@@ -201,8 +337,10 @@ namespace PhoDiem_TLU.DatabaseIO
             }
             return result;
         }
-        public List<MarksByEnrollmentClass> getMarksEnrollmentClass(long? subject_id, long? school_year_id_start, long? school_year_id_end, long subject_exam_type_id,
-            long? enrolmentClassID)
+        
+        //Lay diem cua mot lop quan ly theo tung nam
+        public List<MarksByEnrollmentClass> getMarksEnrollmentClass(long? subject_id, long? school_year_id_start, long? school_year_id_end,
+            long subject_exam_type_id,long? enrollmentClassID)
         {
             var listStudent = (from schoolYear in models.tbl_shool_year
                                join enrollmentClass in models.tbl_enrollment_class
@@ -223,7 +361,7 @@ namespace PhoDiem_TLU.DatabaseIO
                                where schoolYear.id >= school_year_id_start && schoolYear.id <= school_year_id_end
                                && subject.id == subject_id
                                && subjectExam.subject_exam_type_id == subject_exam_type_id
-                               && enrollmentClass.id == enrolmentClassID
+                               && enrollmentClass.id == enrollmentClassID
                                select new
                                {
                                    enrollmentClassID = enrollmentClass.id,
@@ -231,6 +369,7 @@ namespace PhoDiem_TLU.DatabaseIO
                                    subjectID = subject.id,
                                    subjectName = subject.subject_name,
                                    schoolYearID = schoolYear.id,
+                                   year = schoolYear.year,
                                    mark = studentMark.mark
                                }).ToList();
             var result = (from list in listStudent
@@ -240,6 +379,7 @@ namespace PhoDiem_TLU.DatabaseIO
                           select new
                           {
                               schoolYearID = listGroup.Key,
+                              year = sublist.year,
                               enrollmentClassID = sublist.enrollmentClassID,
                               enrollmentClassName = sublist.enrollmentClassName,
                               subjectID = sublist.subjectID,
@@ -253,8 +393,7 @@ namespace PhoDiem_TLU.DatabaseIO
 
                           }
                           ).Distinct().ToList().Select(x => new MarksByEnrollmentClass(0, x.subjectID, x.subjectName, x.enrollmentClassID, x.enrollmentClassName,
-                              x.schoolYearID,
-                              null,
+                              x.year,
                               x.Tong,
                               x.A,
                               Math.Round((double)x.A * 100 / x.Tong, 2),
@@ -276,6 +415,82 @@ namespace PhoDiem_TLU.DatabaseIO
             }
             return result;
         }
+
+        //Lấy điểm tổng kết của một lớp quản lý trong nhiều năm
+        public List<MarksByEnrollmentClass> getMarksEnrollmentClass(long? subject_id, long? school_year_id_start, long? school_year_id_end,
+            long? enrollmentClassID)
+        {
+            var listStudent = (from schoolYear in models.tbl_shool_year
+                               join enrollmentClass in models.tbl_enrollment_class
+                               on schoolYear.year equals enrollmentClass.schoolYear
+
+                               join student in models.tbl_student
+                               on enrollmentClass.id equals student.class_id
+
+                               join studentSubjectMark in models.tbl_student_subject_mark
+                               on student.id equals studentSubjectMark.student_id
+
+                               join subject in models.tbl_subject
+                               on studentSubjectMark.subject_id equals subject.id
+
+
+
+                               where schoolYear.id >= school_year_id_start && schoolYear.id <= school_year_id_end
+                               && subject.id == subject_id
+                               && enrollmentClass.id == enrollmentClassID
+                               select new
+                               {
+                                   enrollmentClassID = enrollmentClass.id,
+                                   enrollmentClassName = enrollmentClass.className,
+                                   subjectID = subject.id,
+                                   subjectName = subject.subject_name,
+                                   schoolYearID = schoolYear.id,
+                                   year = schoolYear.year,
+                                   mark = studentSubjectMark.mark
+                               }).ToList();
+            var result = (from list in listStudent
+                          group list by list.schoolYearID into listGroup
+                          from sublist in listStudent
+                          where listGroup.Key == sublist.schoolYearID
+                          select new
+                          {
+                              schoolYearID = listGroup.Key,
+                              year = sublist.year,
+                              enrollmentClassID = sublist.enrollmentClassID,
+                              enrollmentClassName = sublist.enrollmentClassName,
+                              subjectID = sublist.subjectID,    
+                              subjectName = sublist.subjectName,
+                              Tong = listGroup.Count(),
+                              A = listGroup.Count(x => x.mark >= 8.45 && x.mark <= 10),
+                              B = listGroup.Count(x => x.mark >= 6.95 && x.mark < 8.45),
+                              C = listGroup.Count(x => x.mark >= 5.45 && x.mark < 6.95),
+                              D = listGroup.Count(x => x.mark >= 3.95 && x.mark < 5.45),
+                              F = listGroup.Count(x => x.mark >= 0 && x.mark < 3.95)
+
+                          }
+                          ).Distinct().ToList().Select(x => new MarksByEnrollmentClass(0, x.subjectID, x.subjectName, x.enrollmentClassID, x.enrollmentClassName,
+                              x.year,
+                              x.Tong,
+                              x.A,
+                              Math.Round((double)x.A * 100 / x.Tong, 2),
+                              x.B,
+                              Math.Round((double)x.B * 100 / x.Tong, 2),
+                              x.C,
+                              Math.Round((double)x.C * 100 / x.Tong, 2),
+                              x.D,
+                              Math.Round((double)x.D * 100 / x.Tong, 2),
+                              x.F,
+                              Math.Round((double)x.F * 100 / x.Tong, 2)
+
+                          )).ToList();
+            int i = 1;
+            foreach (MarksByEnrollmentClass item in result)
+            {
+                item.stt = i++;
+            }
+            return result;
+        }
+        // Lay diem tong ket cua nhieu lop quan ly 
         public List<MarksByEnrollmentClass> getMarksEnrollmentClass(long? subject_id, long? school_year_id_start, long? school_year_id_end)
         {
             var listStudent = (from schoolYear in models.tbl_shool_year
@@ -299,6 +514,7 @@ namespace PhoDiem_TLU.DatabaseIO
                                {
                                    enrollmentClassID = enrollmentClass.id,
                                    enrollmentClassName = enrollmentClass.className,
+                                   subjectID = subject.id,
                                    subjectName = subject.subject_name,
                                    mark = studentSubjectMark.mark
                                }).ToList();
@@ -310,6 +526,7 @@ namespace PhoDiem_TLU.DatabaseIO
                           {
                               enrollmentClassID = listGroup.Key,
                               enrollmentClassName = sublist.enrollmentClassName,
+                              subjectID = sublist.subjectID,
                               subjectName = sublist.subjectName,
                               Tong = listGroup.Count(),
                               A = listGroup.Count(x => x.mark >= 8.45 && x.mark <= 10),
@@ -319,7 +536,11 @@ namespace PhoDiem_TLU.DatabaseIO
                               F = listGroup.Count(x => x.mark >= 0 && x.mark < 3.95)
 
                           }
-                          ).Distinct().ToList().Select(x => new MarksByEnrollmentClass(0, x.subjectName, x.enrollmentClassName, x.Tong,
+                          ).Distinct().ToList().Select(x => new MarksByEnrollmentClass(0,x.subjectID, x.subjectName,x.enrollmentClassID, 
+                              x.enrollmentClassName, 
+                              school_year_id_start,
+                              school_year_id_end,
+                              x.Tong,
                               x.A,
                               Math.Round((double)x.A * 100 / x.Tong, 2),
                               x.B,
@@ -418,7 +639,7 @@ namespace PhoDiem_TLU.DatabaseIO
 
 
         }
-        public List<MarksByEnrollmentClass> getMarksEnrollmentClass(long? hocKy, long? khoaHoc, long? dotHoc, long? monHoc)
+        public List<MarksByEnrollmentClass> getMarksEnrollmentClasses(long? hocKy, long? khoaHoc, long? dotHoc, long? monHoc)
         {
             var listStudent = (from student in models.tbl_student
                                join enrollmentClass in models.tbl_enrollment_class
@@ -494,6 +715,11 @@ namespace PhoDiem_TLU.DatabaseIO
             return result;
 
 
+        }
+
+        public string getEnrollmentClassName(long? enrollmentClassID)
+        {
+            return models.tbl_enrollment_class.Where(e => e.id == enrollmentClassID).FirstOrDefault().className;
         }
         //Lấy tong so diem A,B,C,D trong nhiều năm
         public Object getSumMarks(List<MarkRate> list)
@@ -678,21 +904,29 @@ namespace PhoDiem_TLU.DatabaseIO
                              subjectId = scs.subjectId,
                              couresSubjectID = scs.couresSubjectID,
                              courseSubjectName = scs.courseSubjectName,
+                             teacherID = scs.teacherID,
                              teacherName = scs.teacherName,
+                             subjectID = scs.subjectId,
                              subjectName = scs.subjectName,
                              numberOfCredit = scs.numberOfCredit,
                              semesterName = scs.semesterName,
                              subjectExamID = scs.subjectExamID,
+                             endYearID = scs.endYearID,
+                             startYearID = scs.startYearID
 
                          }).ToList();
             var result = (from ls in Marks
-                          group ls by ls.teacherName into ls_group
+                          group ls by ls.teacherID into ls_group
                           from ls_2 in Marks
-                          where ls_group.Key == ls_2.teacherName
+                          where ls_group.Key == ls_2.teacherID
                           select new
                           {
+                              subjectID = ls_2.subjectID,
                               subjectName = ls_2.subjectName,
-                              teacherName = ls_group.Key,
+                              teacherID = ls_group.Key,
+                              teacherName = ls_2.teacherName,
+                              startYeadID = ls_2.startYearID,
+                              endYearID = ls_2.endYearID,
                               Tong = ls_group.Count(),
                               A = ls_group.Count(x => x.mark >= 8.45 && x.mark <= 10),
                               B = ls_group.Count(x => x.mark >= 6.95 && x.mark < 8.45),
@@ -701,7 +935,69 @@ namespace PhoDiem_TLU.DatabaseIO
                               F = ls_group.Count(x => x.mark >= 0 && x.mark < 3.95),
                               numberOfCredit = ls_2.numberOfCredit
 
-                          }).Distinct().ToList().Select(x => new MarkRate(0, x.subjectName, x.teacherName, x.Tong,
+                          }).Distinct().ToList().Select(x => new MarkRate(0,x.subjectID,x.subjectName,x.teacherID, x.teacherName,
+                          x.startYeadID,x.endYearID,
+                          x.Tong,
+                          x.A,
+                          Math.Round((double)x.A * 100 / x.Tong, 2),
+                          x.B,
+                          Math.Round((double)x.B * 100 / x.Tong, 2),
+                          x.C,
+                          Math.Round((double)x.C * 100 / x.Tong, 2),
+                          x.D,
+                          Math.Round((double)x.D * 100 / x.Tong, 2),
+                          x.F,
+                          Math.Round((double)x.F * 100 / x.Tong, 2)
+                          )).ToList();
+            int i = 1;
+            foreach (var item in result)
+            {
+                item.stt = i++;
+            }
+            return result;
+        }
+        //lấy điểm của tất cả sinh viên của một giáo viên trong nhiều năm theo từng năm
+        public List<MarkRate> getMarkByTeacher(List<StudentCourseSubject> studentCourseSubjects,long? teacherID, long subject_exam_type_id)
+        {
+            var Marks = (from scs in studentCourseSubjects
+                         join subjectExam in models.tbl_subject_exam
+                         on scs.subjectExamID equals subjectExam.id
+
+                         where subjectExam.subject_exam_type_id == subject_exam_type_id
+                         select new
+                         {
+                             studentId = scs.studentId,
+                             mark = scs.mark,
+                             subjectId = scs.subjectId,
+                             couresSubjectID = scs.couresSubjectID,
+                             courseSubjectName = scs.courseSubjectName,
+                             teacherID = scs.teacherID,
+                             teacherName = scs.teacherName,
+                             subjectName = scs.subjectName,
+                             numberOfCredit = scs.numberOfCredit,
+                             semesterName = scs.semesterName,
+                             subjectExamID = scs.subjectExamID,
+                             year = scs.year,
+
+                         }).ToList();
+            var result = (from ls in Marks
+                          group ls by ls.year into ls_group
+                          from ls_2 in Marks
+                          where ls_group.Key == ls_2.year
+                          select new
+                          {
+                              subjectName = ls_2.subjectName,
+                              year = ls_group.Key,
+                              teacherName = ls_2.teacherName,
+                              Tong = ls_group.Count(),
+                              A = ls_group.Count(x => x.mark >= 8.45 && x.mark <= 10),
+                              B = ls_group.Count(x => x.mark >= 6.95 && x.mark < 8.45),
+                              C = ls_group.Count(x => x.mark >= 5.45 && x.mark < 6.95),
+                              D = ls_group.Count(x => x.mark >= 3.95 && x.mark < 5.45),
+                              F = ls_group.Count(x => x.mark >= 0 && x.mark < 3.95),
+                              numberOfCredit = ls_2.numberOfCredit
+
+                          }).Distinct().ToList().Select(x => new MarkRate(0,x.year, x.teacherName, x.Tong,
                           x.A,
                           Math.Round((double)x.A * 100 / x.Tong, 2),
                           x.B,
@@ -721,7 +1017,7 @@ namespace PhoDiem_TLU.DatabaseIO
             }
             return result;
         }
-        //lay ti le diem cua giao vien
+        //lay ti le diem cua giao vien theo tên
         public List<MarkRate> getMarkByTeacher(List<Data> sublist)
         {
             var result = (from sl in sublist
@@ -760,6 +1056,89 @@ namespace PhoDiem_TLU.DatabaseIO
             return result; 
         }
 
+        //Lấy tỉ lệ điểm tổng kết sinh viên của nhiều giáo viên trong nhiều năm
+        public List<MarkRate> getMarkByTeacher(List<Mark> sublist)
+        {
+            var result = (from sl in sublist
+                          group sl by sl.teacherID into sl_group
+                          from sl_2 in sublist
+                          where sl_group.Key == sl_2.teacherID
+                          select new
+                          {
+                              subjectID = sl_2.subjectID,
+                              subjectName = sl_2.subjectName,
+                              teacherID = sl_group.Key,
+                              teacherName = sl_2.teacherName,
+                              startYearID = sl_2.startYearID,
+                              endYearID = sl_2.endYearID,
+                              Tong = sl_group.Count(),
+                              A = sl_group.Count(x => x.student_Subject_Mark == 4),
+                              B = sl_group.Count(x => x.student_Subject_Mark == 3),
+                              C = sl_group.Count(x => x.student_Subject_Mark == 2),
+                              D = sl_group.Count(x => x.student_Subject_Mark == 1),
+                              F = sl_group.Count(x => x.student_Subject_Mark == 0),
+                              numberOfCredit = sl_2.numberOfCredit
+                          }).Distinct().ToList().Select(x => new MarkRate(0,x.subjectID, x.subjectName,x.teacherID,x.teacherName,
+                          x.startYearID,x.endYearID,x.Tong,
+                          x.A,
+                          Math.Round((double)x.A * 100 / x.Tong, 2),
+                          x.B,
+                          Math.Round((double)x.B * 100 / x.Tong, 2),
+                          x.C,
+                          Math.Round((double)x.C * 100 / x.Tong, 2),
+                          x.D,
+                          Math.Round((double)x.D * 100 / x.Tong, 2),
+                          x.F,
+                          Math.Round((double)x.F * 100 / x.Tong, 2)
+                          )).ToList();
+            int i = 1;
+            foreach (var item in result)
+            {
+                item.stt = i++;
+            }
+            return result;
+        }
+        public List<MarkRate> getMarkByTeacher(List<Mark> sublist,long? teacherID)
+        {
+            var result = (from sl in sublist
+                          group sl by sl.year into sl_group
+                          from sl_2 in sublist
+                          where sl_group.Key == sl_2.year
+                          select new
+                          {
+                              subjectID = sl_2.subjectID,
+                              subjectName = sl_2.subjectName,
+                              teacherID = sl_2.teacherID,
+                              teacherName = sl_2.teacherName,
+                              year = sl_2.year,
+                              Tong = sl_group.Count(),
+                              A = sl_group.Count(x => x.student_Subject_Mark == 4),
+                              B = sl_group.Count(x => x.student_Subject_Mark == 3),
+                              C = sl_group.Count(x => x.student_Subject_Mark == 2),
+                              D = sl_group.Count(x => x.student_Subject_Mark == 1),
+                              F = sl_group.Count(x => x.student_Subject_Mark == 0),
+                              numberOfCredit = sl_2.numberOfCredit
+                          }).Distinct().ToList().Select(x => new MarkRate(0, x.year, x.teacherName,
+                          x.Tong,
+                          x.A,
+                          Math.Round((double)x.A * 100 / x.Tong, 2),
+                          x.B,
+                          Math.Round((double)x.B * 100 / x.Tong, 2),
+                          x.C,
+                          Math.Round((double)x.C * 100 / x.Tong, 2),
+                          x.D,
+                          Math.Round((double)x.D * 100 / x.Tong, 2),
+                          x.F,
+                          Math.Round((double)x.F * 100 / x.Tong, 2),
+                          x.numberOfCredit
+                          )).ToList();
+            int i = 1;
+            foreach (var item in result)
+            {
+                item.stt = i++;
+            }
+            return result;
+        }
         public List<MarkBySemester> GetMarkBySemester(long id, long subject_id, long semester_id)
         {
             var list_result = new List<MarkBySemester>();
@@ -1212,11 +1591,11 @@ namespace PhoDiem_TLU.DatabaseIO
 
         // TeacherName
 
-        public string getTeacherName(int teacherID)
+        public string getTeacherName(long? teacherID)
         {
             try
             {
-                var teacher = models.tbl_person.Where(x => x.user_id == teacherID).FirstOrDefault();
+                var teacher = models.tbl_person.Where(x => x.id == teacherID).FirstOrDefault();
                 return teacher.display_name;
             }
             catch(Exception e)

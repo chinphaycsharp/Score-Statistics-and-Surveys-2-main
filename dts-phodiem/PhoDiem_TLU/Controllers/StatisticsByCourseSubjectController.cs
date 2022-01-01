@@ -215,7 +215,7 @@ namespace PhoDiem_TLU.Controllers
                         }
                         else //điểm tổng kết
                         {
-                            var data = dBIO.getMarksEnrollmentClass(hocKy, khoaHoc, dotHoc, monHoc);
+                            var data = dBIO.getMarksEnrollmentClasses(hocKy, khoaHoc, dotHoc, monHoc);
                             var sumMark = dBIO.getSumMarks(data);
                             return Json(new
                             {
@@ -304,7 +304,7 @@ namespace PhoDiem_TLU.Controllers
                     }
                     else //điểm tổng kết
                     {
-                        dataMark = dBIO.getMarksEnrollmentClass(hocKy, khoaHoc, dotHoc, monHoc);
+                        dataMark = dBIO.getMarksEnrollmentClasses(hocKy, khoaHoc, dotHoc, monHoc);
                     }
                     var fileName = $"{markOption}_{subjectName}.xlsx";
                     var data = ex.ExportExcelDataEnrollmentClass(markOption, subjectName, numberOfCredit, semesterName, dataMark);
