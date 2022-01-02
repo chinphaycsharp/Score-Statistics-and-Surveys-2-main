@@ -715,7 +715,7 @@ namespace PhoDiem_TLU.Helpers
                     sheet.Cells[rowInd, 1].Value = item.stt;
                     sheet.Cells[rowInd, 2].Value = item.subjectName;
                     sheet.Cells[rowInd, 3].Value = item.enrollmentClassName;
-                    sheet.Cells[rowInd, 4].Value = item.sumMark;
+                    sheet.Cells[rowInd, 4].Value = item.sum;
                     sheet.Cells[rowInd, 5].Value = item.A;
                     sheet.Cells[rowInd, 6].Value = item.rateA;
                     sheet.Cells[rowInd, 7].Value = item.B;
@@ -1032,7 +1032,7 @@ namespace PhoDiem_TLU.Helpers
                     sheet.Cells[rowInd, 1].Value = item.stt;
                     sheet.Cells[rowInd, 2].Value = item.year;
                     sheet.Cells[rowInd, 3].Value = item.enrollmentClassName;
-                    sheet.Cells[rowInd, 4].Value = item.sumMark;
+                    sheet.Cells[rowInd, 4].Value = item.sum;
                     sheet.Cells[rowInd, 5].Value = item.A;
                     sheet.Cells[rowInd, 6].Value = item.rateA;
                     sheet.Cells[rowInd, 7].Value = item.B;
@@ -1136,7 +1136,7 @@ namespace PhoDiem_TLU.Helpers
                     sheet.Cells[rowInd, 1].Value = item.stt;
                     sheet.Cells[rowInd, 2].Value = item.subjectName;
                     sheet.Cells[rowInd, 3].Value = item.enrollmentClassName;
-                    sheet.Cells[rowInd, 4].Value = item.sumMark;
+                    sheet.Cells[rowInd, 4].Value = item.sum;
                     sheet.Cells[rowInd, 5].Value = item.A;
                     sheet.Cells[rowInd, 6].Value = item.rateA;
                     sheet.Cells[rowInd, 7].Value = item.B;

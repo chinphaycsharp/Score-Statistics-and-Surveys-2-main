@@ -5,14 +5,14 @@ using System.Web;
 
 namespace PhoDiem_TLU.ViewModels
 {
-    public class MarksByEnrollmentClass
+    public class MarksByEnrollmentClass:MarkRate
     {
         public MarksByEnrollmentClass(long stt, string subjectName, string enrollmentClassName, long sumMark, long a, double rateA, long b, double rateB, long c, double rateC, long d, double rateD, long f, double rateF)
         {
             this.stt = stt;
             this.subjectName = subjectName;
             this.enrollmentClassName = enrollmentClassName;
-            this.sumMark = sumMark;
+            this.sum = sumMark;
             A = a;
             this.rateA = rateA;
             B = b;
@@ -33,9 +33,9 @@ namespace PhoDiem_TLU.ViewModels
             this.subjectName = subjectName;
             this.enrollmentClassID = enrollmentClassID;
             this.enrollmentClassName = enrollmentClassName;
-            this.startYear = startYear;
-            this.endYear = endYear;
-            this.sumMark = sumMark;
+            this.startYearID = startYear;
+            this.endYearID = endYear;
+            this.sum = sumMark;
             A = a;
             this.rateA = rateA;
             B = b;
@@ -47,28 +47,7 @@ namespace PhoDiem_TLU.ViewModels
             F = f;
             this.rateF = rateF;
         }
-        //public MarksByEnrollmentClass(long stt, long? subjectID, string subjectName, long? departmentID,string depertmentName, long? startYear, long? endYear,
-        //    long sumMark, long a, double rateA, long b, double rateB, long c, double rateC, long d, double rateD, long f, double rateF)
-        //{
-        //    this.stt = stt;
-        //    this.subjectID = subjectID;
-        //    this.subjectName = subjectName;
-        //    this.enrollmentClassID = enrollmentClassID;
-        //    this.enrollmentClassName = enrollmentClassName;
-        //    this.startYear = startYear;
-        //    this.endYear = endYear;
-        //    this.sumMark = sumMark;
-        //    A = a;
-        //    this.rateA = rateA;
-        //    B = b;
-        //    this.rateB = rateB;
-        //    C = c;
-        //    this.rateC = rateC;
-        //    D = d;
-        //    this.rateD = rateD;
-        //    F = f;
-        //    this.rateF = rateF;
-        //}
+        
         public MarksByEnrollmentClass(long stt, long? subjectID, string subjectName, long? enrollmentClassID,
             string enrollmentClassName,long? year,
             long sumMark, long a, double rateA, long b, double rateB, long c, double rateC, long d, double rateD, long f, double rateF)
@@ -79,7 +58,7 @@ namespace PhoDiem_TLU.ViewModels
             this.enrollmentClassID = enrollmentClassID;
             this.enrollmentClassName = enrollmentClassName;
             this.year = year;
-            this.sumMark = sumMark;
+            this.sum = sumMark;
             A = a;
             this.rateA = rateA;
             B = b;
@@ -91,29 +70,9 @@ namespace PhoDiem_TLU.ViewModels
             F = f;
             this.rateF = rateF;
         }
-
-        public long stt { get; set; }
-        public long? subjectID { get; set; }
-        public string subjectName { get; set; }
         public long? enrollmentClassID { get; set; }
         public string enrollmentClassName { get; set; }
-        public long? departmentID { get; set; }
-        public string departmentName { get; set; }
-        public long? startYear { get; set; }  
-        public long? endYear { get; set; }
-        public long? year { get; set; }
-        public long sumMark { get; set; }
-
-        public long A { get; set; }
-        public double rateA { get; set; }
-        public long B { get; set; }
-        public double rateB { get; set; }
-        public long C { get; set; }
-        public double rateC { get; set; }
-        public long D { get; set; }
-        public double rateD { get; set; }
-        public long F { get; set; }
-        public double rateF { get; set; }
+        
 
 
 

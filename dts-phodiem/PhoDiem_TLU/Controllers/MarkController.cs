@@ -67,8 +67,6 @@ namespace PhoDiem_TLU.Controllers
                         {
                             var data = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end, 2);
                             var sumMark = dBIO.getSumMarks(data);
-                            //var test = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end);
-                            //var test1 = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end,3);
                             return Json(new
                             {
                                 code = 200,
@@ -96,7 +94,7 @@ namespace PhoDiem_TLU.Controllers
                         else
                         {
                             //Diem tong ket
-                            var data = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end);
+                            var data = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end);
                             var sumMark = dBIO.getSumMarks(data);
                             return Json(new
                             {
@@ -147,7 +145,6 @@ namespace PhoDiem_TLU.Controllers
                         else
                         {
                             var list = dBIO.getMarks(subject_id, school_year_id_start, school_year_id_end);
-                            var sublist = dBIO.getCourseSubjectData(list);
                             var data = dBIO.getMarkByTeacher(list);
                             var sumMark = dBIO.getSumMarks(data);
                             return Json(new
@@ -247,7 +244,7 @@ namespace PhoDiem_TLU.Controllers
                     else
                     {
                         //Diem tong ket
-                        dataMark = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end, 3);
+                        dataMark = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end);
 
                     }
                     var fileName = $"{markOption}_{subjectName}_{startYear}-{EndYear}.xlsx";
@@ -270,7 +267,6 @@ namespace PhoDiem_TLU.Controllers
                     else
                     {
                         var list = dBIO.getMarks(subject_id, school_year_id_start, school_year_id_end);
-                        var sublist = dBIO.getCourseSubjectData(list);
                         dataMark = dBIO.getMarkByTeacher(list);
                         
                     }
@@ -326,7 +322,7 @@ namespace PhoDiem_TLU.Controllers
                 else
                 {
                     //Diem tong ket
-                    dataMark = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end, departmentID);
+                    dataMark = dBIO.getStudentMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end ,departmentID);
 
                 }
                 var fileName = $"{markOption}_{subjectName}_{departmentName}_{startYear}-{EndYear}.xlsx";
@@ -414,44 +410,7 @@ namespace PhoDiem_TLU.Controllers
             }
 
         }
-        [HttpPost]
-        public ActionResult test1(long? subject_id, long? school_year_id_start, long? school_year_id_end,
-            long? enrollmentClassID, string markOption)
-        {
-            
-            List<MarksByEnrollmentClass> dataMark;
-            long startYear = dBIO.getYear(school_year_id_start);
-            long EndYear = dBIO.getYear(school_year_id_end);
-            string subjectName = dBIO.getSubject(subject_id);
-            long numberOfCredit = dBIO.getNumberOfCredit(subject_id);
-            string enrollmentClassName = dBIO.getEnrollmentClassName(enrollmentClassID);
-            if (markOption == "DQT")
-            {
-                dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end, 2, enrollmentClassID);
-            }
-            else if (markOption == "DT")
-            {
-                dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end, 3, enrollmentClassID);
-            }
-            else
-            {
-                //Diem tong ket
-                dataMark = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end);
-
-            }
-            var fileName = $"{markOption}_{subjectName}_{enrollmentClassName}_{startYear}-{EndYear}.xlsx";
-            var data = ex.ExportExcelDataEnrollmentClass(markOption, subjectName, numberOfCredit, enrollmentClassName, startYear, EndYear, dataMark);
-            //return Json(new { code = 200, result = Convert.ToBase64String(data) }, JsonRequestBehavior.AllowGet);
-            return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-            
-
-        }
-        [HttpGet]
-        public virtual ActionResult Download(byte[] file)
-        {
-            var fileName = "test.xlsx";
-            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-        }
+ 
         [HttpPost]
         public ActionResult ExportMarkByTeacher(int teacher, int semester, int courseYear, string markOption)
         {
@@ -520,20 +479,6 @@ namespace PhoDiem_TLU.Controllers
             {
                 log.Error(ex.Message);
                 return Json(new {code = 500}, JsonRequestBehavior.AllowGet);
-            }
-        }
-        [HttpGet]
-        public JsonResult test()
-        {
-            try
-            {
-                var list = dBIO.getRateMarkByTeacher(4444, 2, 3);
-                return Json(new { code = 200, list }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex.Message);
-                return Json(new { code = 500 }, JsonRequestBehavior.AllowGet);
             }
         }
         private void setViewBagYear()

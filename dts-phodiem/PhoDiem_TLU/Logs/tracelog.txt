@@ -145,3 +145,5 @@
 2021-12-25 01:37:56,745 [29] INFO PhoDiem_TLU.Controllers.MarkController - Info
 2021-12-25 01:38:52,312 [35] INFO PhoDiem_TLU.Controllers.MarkController - Info
 2021-12-25 01:42:44,483 [37] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2022-01-03 02:38:13,739 [71] INFO PhoDiem_TLU.Controllers.MarkController - Info
+2022-01-03 02:38:36,741 [67] INFO PhoDiem_TLU.Controllers.MarkController - Info

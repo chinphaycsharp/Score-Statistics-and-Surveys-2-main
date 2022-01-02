@@ -112,9 +112,9 @@ function showHandler(showOption, markOption) {
         else {
             var marks = Marks.getAllData()
             var data = marks.map(data => {
-                var { stt, subjectName, enrollmentClassName, sumMark, A,rateA,B,rateB,C,rateC,D,rateD,F,rateF} = data
+                var { stt, subjectName, enrollmentClassName, sum, A,rateA,B,rateB,C,rateC,D,rateD,F,rateF} = data
                 return {
-                    stt, subjectName, enrollmentClassName, sumMark, A, rateA, B, rateB, C, rateC, D, rateD, F, rateF,
+                    stt, subjectName, enrollmentClassName, sum, A, rateA, B, rateB, C, rateC, D, rateD, F, rateF,
                     'button': `<button onclick= "handleExportEnrollmentClass(${stt},'${markOption}')" class="download export"><i class="fa fa-download" aria-hidden="true"></i></button>`
                 }
             })
@@ -218,9 +218,9 @@ function fillDataToChart(list,type) {
     let typeChart = 'horizontalBar';
     let istypeBar = false;
     let labels;
-    if (type == 'HTN') {
+    if (type == 'HTK') {
         labels = list.map(function (data) {
-            return data.courseSubjectName;
+            return data.departmentName;
 
         })
     }
