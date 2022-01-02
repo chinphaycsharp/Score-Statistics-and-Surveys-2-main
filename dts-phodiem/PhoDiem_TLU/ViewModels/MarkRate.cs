@@ -7,6 +7,10 @@ namespace PhoDiem_TLU.ViewModels
 {
     public class MarkRate
     {
+        public MarkRate()
+        {
+
+        }
         public MarkRate(long stt, string subjectName, string teacherName, long sum, long a, double rateA, long b, double rateB, long c, double rateC, long d, double rateD, long f, double rateF, long? numberOfCredit)
         {
             this.stt = stt;

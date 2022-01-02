@@ -2,7 +2,7 @@
     var ok = false;
     var dataMark = null;
     handlefilter();
-    var table = $("#table_id_course-subject").DataTable({
+    var table = $("#table_id_department").DataTable({
         "processing": true,
     });
         
@@ -71,13 +71,23 @@ $('form').submit(function (even) {
 function showHandler(showOption, markOption) {
     console.log(showOption, markOption)
     if (dataMark != null) {
-        console.log(dataMark)
-        if (showOption === "HTN") {
-            data = dataMark.map(Object.values)
-            $("#table_id_course-subject").DataTable().clear();
-            $("#table_id_course-subject").DataTable().rows.add(data);
-            $("#table_id_course-subject").DataTable().draw();
-            $("#table_id_course-subject").show();
+        
+        if (showOption === "HTK") {
+            var marks = Marks.getAllData()
+            var data = marks.map(data => {
+                var { stt, subjectName, departmentName, sum, A, rateA, B, rateB, C, rateC, D, rateD, F, rateF } = data
+                return {
+                    stt, subjectName, departmentName, sum, A, rateA, B, rateB, C, rateC, D, rateD, F, rateF,
+                    'button': `<button onclick= "handleExportDepartment(${stt},'${markOption}')" class="download export"><i class="fa fa-download" aria-hidden="true"></i></button>`
+                }
+            })
+            console.log(data)
+            data = data.map(Object.values)
+            console.log(data)
+            $("#table_id_department").DataTable().clear();
+            $("#table_id_department").DataTable().rows.add(data);
+            $("#table_id_department").DataTable().draw();
+            $("#table_id_department").show();
             $("#table_id_teacher_wrapper").hide();
             $("#table_id_enrollmentClass_wrapper").hide();
         }
@@ -96,7 +106,7 @@ function showHandler(showOption, markOption) {
             $("#table_id_teacher").DataTable().rows.add(data);
             $("#table_id_teacher").DataTable().draw();
             $("#table_id_teacher").show();
-            $("#table_id_course-subject_wrapper").hide();
+            $("#table_id_department_wrapper").hide();
             $("#table_id_enrollmentClass_wrapper").hide();
         }
         else {
@@ -114,11 +124,36 @@ function showHandler(showOption, markOption) {
             $("#table_id_enrollmentClass").DataTable().rows.add(data);
             $("#table_id_enrollmentClass").DataTable().draw();
             $("#table_id_teacher_wrapper").hide();
-            $("#table_id_course-subject_wrapper").hide();
+            $("#table_id_department_wrapper").hide();
             $("#table_id_enrollmentClass").show();
         }
 
     }
+}
+function handleExportDepartment(stt, markOption) {
+    var mark = Marks.getData(stt)
+    console.log(mark.subjectID, mark.startYearID, mark.endYearID, mark.departmentID, markOption)
+    $.post("../Mark/ExportFileDepartment", {
+        subject_id: mark.subjectID,
+        school_year_id_start: mark.startYearID,
+        school_year_id_end: mark.endYearID,
+        departmentID: mark.departmentID,
+        markOption: markOption
+    }, function (data) {
+        if (data.code == 200) {
+            var bytes = Base64ToBytes(data.result)
+            var a = window.document.createElement('a')
+
+            a.href = window.URL.createObjectURL(new Blob([bytes], { type: 'application/xlsx' }))
+
+            a.download = `${data.fileName}`
+
+            document.body.appendChild(a)
+            a.click();
+            document.body.removeChild(a)
+        }
+        else alert("Lỗi khi xuất file")
+    })
 }
 function handleExportTeacher(stt, markOption) {
     var mark = Marks.getData(stt)

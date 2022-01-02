@@ -33,7 +33,7 @@ namespace PhoDiem_TLU.Controllers
             var subject = dBIO.getSubject();
             var years = dBIO.getYear();
             List<SelectListItem> provinces = new List<SelectListItem>();
-            provinces.Add(new SelectListItem() { Text = "Hiển thị theo nhóm", Value = "HTN" });
+            provinces.Add(new SelectListItem() { Text = "Hiển thị theo khoa", Value = "HTK" });
             provinces.Add(new SelectListItem() { Text = "Hiển thị theo giáo viên", Value = "HTGV" });
             provinces.Add(new SelectListItem() { Text = "Hiển thị theo lớp quản lý", Value = "HTL" });
 
@@ -61,13 +61,11 @@ namespace PhoDiem_TLU.Controllers
                 if (subject_id != null && school_year_id_start != null && school_year_id_end != null && showoption != null && markOption != null)
                 {
 
-                    if (showoption == "HTN")
+                    if (showoption == "HTK")
                     {
-                        List<StudentCourseSubject> studentCourseSubjects = dBIO.getMarks_2(subject_id, school_year_id_start, school_year_id_end);
-
                         if (markOption == "Điểm quá trình")
                         {
-                            var data = dBIO.getCourseSubjectData(studentCourseSubjects, 2);
+                            var data = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end, 2);
                             var sumMark = dBIO.getSumMarks(data);
                             //var test = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end);
                             //var test1 = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end,3);
@@ -83,7 +81,7 @@ namespace PhoDiem_TLU.Controllers
                         }
                         else if (markOption == "Điểm thi")
                         {
-                            var data = dBIO.getCourseSubjectData(studentCourseSubjects, 3);
+                            var data = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end, 3);
                             var sumMark = dBIO.getSumMarks(data);
                             return Json(new
                             {
@@ -98,8 +96,7 @@ namespace PhoDiem_TLU.Controllers
                         else
                         {
                             //Diem tong ket
-                            var list = dBIO.getMarks(subject_id, school_year_id_start, school_year_id_end);
-                            var data = dBIO.getCourseSubjectData(list);
+                            var data = dBIO.getMarksEnrollmentClass(subject_id, school_year_id_start, school_year_id_end);
                             var sumMark = dBIO.getSumMarks(data);
                             return Json(new
                             {
@@ -236,26 +233,25 @@ namespace PhoDiem_TLU.Controllers
                 long EndYear = dBIO.getYear(school_year_id_end);
                 string subjectName = dBIO.getSubject(subject_id);
                 long numberOfCredit = dBIO.getNumberOfCredit(subject_id);
-                if (showoption == "HTN")
+                if (showoption == "HTK")
                 {
-                    List<StudentCourseSubject> studentCourseSubjects
-                        = dBIO.getMarks_2(subject_id, school_year_id_start, school_year_id_end);
-                    List<Data> dataMark;
-                    if (markOption == "Điểm thi")
+                    List<MarkByDepartment> dataMark;
+                    if (markOption == "Điểm quá trình")
                     {
-                        dataMark = dBIO.getCourseSubjectData(studentCourseSubjects, 3);
+                        dataMark = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end, 2);
                     }
-                    else if (markOption == "Điểm quá trình")
+                    else if (markOption == "Điểm thi")
                     {
-                        dataMark = dBIO.getCourseSubjectData(studentCourseSubjects, 2);
+                        dataMark = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end, 3);
                     }
                     else
                     {
-                        var list = dBIO.getMarks(subject_id, school_year_id_start, school_year_id_end);
-                        dataMark = dBIO.getCourseSubjectData(list);
+                        //Diem tong ket
+                        dataMark = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end, 3);
+
                     }
                     var fileName = $"{markOption}_{subjectName}_{startYear}-{EndYear}.xlsx";
-                    var data = ex.ExportExcelDataCourseSubject(markOption, subjectName, numberOfCredit, startYear, EndYear, dataMark);
+                    var data = ex.ExportExcelDataDepartment(markOption, subjectName, numberOfCredit, startYear, EndYear, dataMark);
                     return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
                 }
                 else if (showoption == "HTGV")
@@ -306,6 +302,42 @@ namespace PhoDiem_TLU.Controllers
                 }
             }
             else return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public JsonResult ExportFileDepartment(long? subject_id, long? school_year_id_start, long? school_year_id_end,
+            long? departmentID, string markOption)
+        {
+            try
+            {
+                List<MarkByDepartment> dataMark;
+                long startYear = dBIO.getYear(school_year_id_start);
+                long EndYear = dBIO.getYear(school_year_id_end);
+                string subjectName = dBIO.getSubject(subject_id);
+                long numberOfCredit = dBIO.getNumberOfCredit(subject_id);
+                string departmentName = dBIO.getDepartmentName(departmentID);
+                if (markOption == "Điểm quá trình")
+                {
+                    dataMark = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end, 2, departmentID);
+                }
+                else if (markOption == "Điểm thi")
+                {
+                    dataMark = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end, 3, departmentID);
+                }
+                else
+                {
+                    //Diem tong ket
+                    dataMark = dBIO.getMarksByDepartMent(subject_id, school_year_id_start, school_year_id_end, departmentID);
+
+                }
+                var fileName = $"{markOption}_{subjectName}_{departmentName}_{startYear}-{EndYear}.xlsx";
+                var data = ex.ExportExcelDataDepartment(markOption, subjectName, numberOfCredit, departmentName, startYear, EndYear, dataMark);
+                return Json(new { code = 200, fileName, departmentName, result = Convert.ToBase64String(data) }, JsonRequestBehavior.AllowGet);
+                //return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { code = 500, }, JsonRequestBehavior.AllowGet);
+            }
         }
 
         [HttpPost]

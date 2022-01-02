@@ -721,6 +721,169 @@ namespace PhoDiem_TLU.DatabaseIO
         {
             return models.tbl_enrollment_class.Where(e => e.id == enrollmentClassID).FirstOrDefault().className;
         }
+
+        //Lấy điểm sinh viên theo nhiều phòng ban
+        public List<MarkByDepartment> getMarksByDepartMent(long? subjectID,long? startYear,long? endYear,long? subject_exam_type_id)
+        {
+            var listStudent = (from schoolYear in models.tbl_shool_year
+                               join enrollmentClass in models.tbl_enrollment_class
+                               on schoolYear.year equals enrollmentClass.schoolYear
+
+                               join student in models.tbl_student
+                               on enrollmentClass.id equals student.class_id
+
+                               join studentMark in models.tbl_student_mark
+                               on student.id equals studentMark.student_id
+
+                               join subject in models.tbl_subject
+                               on studentMark.subject_id equals subject.id
+
+                               join subjectExam in models.tbl_subject_exam
+                               on studentMark.subject_exam_id equals subjectExam.id
+
+                               join department in models.tbl_department
+                               on enrollmentClass.department_id equals department.id
+
+                               where schoolYear.id >= startYear && schoolYear.id <= endYear
+                               && subject.id == subjectID
+                               && subjectExam.subject_exam_type_id == subject_exam_type_id
+                               && department.level == 1
+                               && (department.department_type == 2 || department.department_type == 0)
+                               select new
+                               {
+                                   enrollmentClassID = enrollmentClass.id,
+                                   enrollmentClassName = enrollmentClass.className,
+                                   departmentID = department.id,
+                                   departmentName = department.name,
+                                   subjectID = subject.id,
+                                   subjectName = subject.subject_name,
+                                   mark = studentMark.mark
+                               }).ToList();
+            var result = (from list in listStudent
+                          group list by list.departmentID into listGroup
+                          from sublist in listStudent
+                          where listGroup.Key == sublist.departmentID
+                          select new
+                          {
+                              departmentID = listGroup.Key,
+                              departmentName = sublist.departmentName,
+                              subjectID = sublist.subjectID,
+                              subjectName = sublist.subjectName,
+                              Tong = listGroup.Count(),
+                              A = listGroup.Count(x => x.mark >= 8.45 && x.mark <= 10),
+                              B = listGroup.Count(x => x.mark >= 6.95 && x.mark < 8.45),
+                              C = listGroup.Count(x => x.mark >= 5.45 && x.mark < 6.95),
+                              D = listGroup.Count(x => x.mark >= 3.95 && x.mark < 5.45),
+                              F = listGroup.Count(x => x.mark >= 0 && x.mark < 3.95)
+
+                          }
+                          ).Distinct().ToList().Select(x => new MarkByDepartment(0, x.subjectID, x.subjectName, x.departmentID, x.departmentName,
+                              startYear,
+                              endYear,
+                              x.Tong,
+                              x.A,
+                              Math.Round((double)x.A * 100 / x.Tong, 2),
+                              x.B,
+                              Math.Round((double)x.B * 100 / x.Tong, 2),
+                              x.C,
+                              Math.Round((double)x.C * 100 / x.Tong, 2),
+                              x.D,
+                              Math.Round((double)x.D * 100 / x.Tong, 2),
+                              x.F,
+                              Math.Round((double)x.F * 100 / x.Tong, 2)
+
+                          )).ToList();
+
+            int i = 1;
+            foreach (MarkByDepartment item in result)
+            {
+                item.stt = i++;
+            }
+            return result;
+        }
+        public List<MarkByDepartment> getMarksByDepartMent(long? subjectID, long? startYear, long? endYear, long? subject_exam_type_id,long? departmentID)
+        {
+            var listStudent = (from schoolYear in models.tbl_shool_year
+                               join enrollmentClass in models.tbl_enrollment_class
+                               on schoolYear.year equals enrollmentClass.schoolYear
+
+                               join student in models.tbl_student
+                               on enrollmentClass.id equals student.class_id
+
+                               join studentMark in models.tbl_student_mark
+                               on student.id equals studentMark.student_id
+
+                               join subject in models.tbl_subject
+                               on studentMark.subject_id equals subject.id
+
+                               join subjectExam in models.tbl_subject_exam
+                               on studentMark.subject_exam_id equals subjectExam.id
+
+                               join department in models.tbl_department
+                               on enrollmentClass.department_id equals department.id
+
+                               where schoolYear.id >= startYear && schoolYear.id <= endYear
+                               && subject.id == subjectID
+                               && subjectExam.subject_exam_type_id == subject_exam_type_id
+                               && department.id == departmentID
+                               select new
+                               {
+                                   enrollmentClassID = enrollmentClass.id,
+                                   enrollmentClassName = enrollmentClass.className,
+                                   departmentID = department.id,
+                                   departmentName = department.name,
+                                   subjectID = subject.id,
+                                   subjectName = subject.subject_name,
+                                   year = schoolYear.year,
+                                   mark = studentMark.mark
+                               }).ToList();
+            var result = (from list in listStudent
+                          group list by list.year into listGroup
+                          from sublist in listStudent
+                          where listGroup.Key == sublist.year
+                          select new
+                          {
+                              departmentID = sublist.departmentID,
+                              departmentName = sublist.departmentName,
+                              subjectID = sublist.subjectID,
+                              subjectName = sublist.subjectName,
+                              year = listGroup.Key,
+                              Tong = listGroup.Count(),
+                              A = listGroup.Count(x => x.mark >= 8.45 && x.mark <= 10),
+                              B = listGroup.Count(x => x.mark >= 6.95 && x.mark < 8.45),
+                              C = listGroup.Count(x => x.mark >= 5.45 && x.mark < 6.95),
+                              D = listGroup.Count(x => x.mark >= 3.95 && x.mark < 5.45),
+                              F = listGroup.Count(x => x.mark >= 0 && x.mark < 3.95)
+
+                          }
+                          ).Distinct().ToList().Select(x => new MarkByDepartment(0, x.subjectID, x.subjectName, x.departmentID, x.departmentName,
+                              x.year,
+                              x.Tong,
+                              x.A,
+                              Math.Round((double)x.A * 100 / x.Tong, 2),
+                              x.B,
+                              Math.Round((double)x.B * 100 / x.Tong, 2),
+                              x.C,
+                              Math.Round((double)x.C * 100 / x.Tong, 2),
+                              x.D,
+                              Math.Round((double)x.D * 100 / x.Tong, 2),
+                              x.F,
+                              Math.Round((double)x.F * 100 / x.Tong, 2)
+
+                          )).ToList();
+
+            int i = 1;
+            foreach (MarkByDepartment item in result)
+            {
+                item.stt = i++;
+            }
+            return result;
+        }
+        public string getDepartmentName(long? departmentID)
+        {
+            if (departmentID == null) return "";
+            else return models.tbl_department.Where(x => x.id == departmentID).FirstOrDefault().name;
+        }
         //Lấy tong so diem A,B,C,D trong nhiều năm
         public Object getSumMarks(List<MarkRate> list)
         {
@@ -749,6 +912,19 @@ namespace PhoDiem_TLU.DatabaseIO
             return result;
         }
         public Object getSumMarks(List<MarksByEnrollmentClass> list)
+        {
+            long[] result = { 0, 0, 0, 0, 0 };
+            foreach (var item in list)
+            {
+                if (item.A > 0) result[0] += item.A;
+                if (item.B > 0) result[1] += item.B;
+                if (item.C > 0) result[2] += item.C;
+                if (item.D > 0) result[3] += item.D;
+                if (item.F > 0) result[4] += item.F;
+            }
+            return result;
+        }
+        public Object getSumMarks(List<MarkByDepartment> list)
         {
             long[] result = { 0, 0, 0, 0, 0 };
             foreach (var item in list)

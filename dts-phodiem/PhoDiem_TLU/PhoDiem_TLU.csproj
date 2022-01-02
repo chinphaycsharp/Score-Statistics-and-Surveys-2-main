@@ -318,6 +318,7 @@
     <Compile Include="Helpers\ExcelExport.cs" />
     <Compile Include="Commons\PaginationSet.cs" />
     <Compile Include="ViewModels\DataViewModels.cs" />
+    <Compile Include="ViewModels\MarkByDepartment.cs" />
     <Compile Include="ViewModels\RoleViewModel.cs" />
     <Compile Include="ViewModels\UpdateUserViewModel.cs" />
     <Compile Include="ViewModels\UserAddViewModel.cs" />
