@@ -687,19 +687,22 @@ namespace PhoDiem_TLU.DatabaseIO
         public List<MarkBySemester> GetMarkBySemester(long id, long subject_id, long semester_id)
         {
             var list_result = new List<MarkBySemester>();
+            var cl = models.tbl_course_subject.Find(id);
             var list_student = (from s in models.tbl_student_course_subject
+                                join s3 in models.tbl_person
+                                on s.student_id equals s3.id
+                                join s4 in models.tbl_student
+                                on s.student_id equals s4.id
                                 where s.course_subject_id == id
-                                select s.student_id).ToList();
-
-            var list = (from s in models.tbl_course_subject
-                        join s1 in models.tbl_student_course_subject
-                        on s.id equals s1.course_subject_id
+                                select new { 
+                                    id = s.student_id,
+                                    name = s3.display_name,
+                                    code = s4.student_code,
+                                }).ToList();
+            var list = (from s1 in models.tbl_student_course_subject
 
                         join s2 in models.tbl_student_subject_mark
                         on s1.student_id equals s2.student_id
-
-                        join s3 in models.tbl_person
-                        on s1.student_id equals s3.id
 
                         join s4 in models.tbl_student
                         on s1.student_id equals s4.id
@@ -710,36 +713,41 @@ namespace PhoDiem_TLU.DatabaseIO
                         join s6 in models.tbl_subject_exam
                         on s5.subject_exam_id equals s6.id
 
-                        where s.id == id
+                        where s1.course_subject_id == id
                         && s2.subject_id == subject_id
                         && s2.semester_id == semester_id
                         select new
                         {
                             id = s4.id,
-                            code = s4.student_code,
-                            name = s3.display_name,
                             mark = s5.mark,
                             mark_final = s2.mark,
                             mark_gpa = s2.mark4,
                             note = s2.note,
-                            type = s6.subject_exam_type_id
+                            type = s6.subject_exam_type_id,
+                            room_id = s5.student_exam_room_id
                         }).ToList();
-            int stt = 0;
             foreach (var s in list_student)
             {
                 try
                 {
-                    var mark = list.Where(ss => ss.id == s && ss.type == 2).FirstOrDefault();
-                    var mark_exam = list.Where(ss => ss.id == s && ss.type == 3).FirstOrDefault();
-                    var temp = list.Where(ss => ss.id == s).FirstOrDefault();
-                    if (mark == null || mark_exam == null || temp == null) continue;
+                    var mark = list.Where(ss => ss.id == s.id && ss.type == 2).FirstOrDefault();
+                    var mark_exam = list.Where(ss => ss.id == s.id && ss.type == 3).FirstOrDefault();
+                    var temp = list.Where(ss => ss.id == s.id).FirstOrDefault();
                     char gpa = 'F';
-                    if ((int)temp.mark_gpa == 4) gpa = 'A';
-                    else if ((int)temp.mark_gpa == 3) gpa = 'B';
-                    else if ((int)temp.mark_gpa == 2) gpa = 'C';
-                    else if ((int)temp.mark_gpa == 1) gpa = 'D';
-                    stt++;
-                    list_result.Add(new MarkBySemester(stt, temp.code, temp.name, (double)mark.mark, (double)mark_exam.mark, (double)temp.mark_final, gpa, (double)temp.mark_gpa, temp.note));
+                    
+                    if (mark == null || mark_exam == null || temp == null)
+                    {
+                        list_result.Add(new MarkBySemester(cl.display_name, s.code, s.name, mark == null ? -1 : (double)mark.mark, mark_exam == null ? -1 : (double)mark_exam.mark, temp == null ? -1 : (double)temp.mark_final, gpa, 0, "") { status = -1 });
+                    }
+                    else
+                    {
+                        var stt = models.tbl_student_semester_subject_exam_room.Find(temp.room_id);
+                        if ((int)temp.mark_gpa == 4) gpa = 'A';
+                        else if ((int)temp.mark_gpa == 3) gpa = 'B';
+                        else if ((int)temp.mark_gpa == 2) gpa = 'C';
+                        else if ((int)temp.mark_gpa == 1) gpa = 'D';
+                        list_result.Add(new MarkBySemester(cl.display_name, s.code, s.name, (double)mark.mark, (double)mark_exam.mark, (double)temp.mark_final, gpa, (double)temp.mark_gpa, temp.note) { status = (stt == null ? 0 : (stt.exam_status_id == null ? 0 : (long)stt.exam_status_id)) });
+                    }
                 }
                 catch (Exception e)
                 {
@@ -751,13 +759,19 @@ namespace PhoDiem_TLU.DatabaseIO
         public List<MarkBySemester> GetMarkByClass(long id, long subject_id, long semester_id)
         {
             var list_result = new List<MarkBySemester>();
+            var cl = models.tbl_enrollment_class.Find(id);
             var list_student = (from s in models.tbl_student
-                                where s.class_id == id
-                                select s.id).ToList();
+                                join s1 in models.tbl_person
+                                on s.id equals s1.id
 
-            var list = (from enroll in models.tbl_enrollment_class
-                        join student in models.tbl_student
-                        on enroll.id equals student.class_id
+                                where s.class_id == id
+                                select new {
+                                    id = s.id,
+                                    name = s1.display_name,
+                                    code = s.student_code
+                                }).ToList();
+
+            var list = (from student in models.tbl_student
 
                         join subjectMark in models.tbl_student_subject_mark
                         on student.id equals subjectMark.student_id
@@ -771,7 +785,7 @@ namespace PhoDiem_TLU.DatabaseIO
                         join exam in models.tbl_subject_exam
                         on mark.subject_exam_id equals exam.id
 
-                        where enroll.id == id
+                        where student.class_id == id
                         && subjectMark.subject_id == subject_id
                         && subjectMark.semester_id == semester_id
                         select new
@@ -783,24 +797,31 @@ namespace PhoDiem_TLU.DatabaseIO
                             mark_final = subjectMark.mark,
                             mark_gpa = subjectMark.mark4,
                             note = subjectMark.note,
-                            type = exam.subject_exam_type_id
+                            type = exam.subject_exam_type_id,
+                            room_id = mark.student_exam_room_id
                         }).ToList();
-            int stt = 0;
             foreach (var s in list_student)
             {
                 try
                 {
-                    var mark = list.Where(ss => ss.id == s && ss.type == 2).FirstOrDefault();
-                    var mark_exam = list.Where(ss => ss.id == s && ss.type == 3).FirstOrDefault();
-                    var temp = list.Where(ss => ss.id == s).FirstOrDefault();
-                    if (mark == null || mark_exam == null || temp == null) continue;
+                    var mark = list.Where(ss => ss.id == s.id && ss.type == 2).FirstOrDefault();
+                    var mark_exam = list.Where(ss => ss.id == s.id && ss.type == 3).FirstOrDefault();
+                    var temp = list.Where(ss => ss.id == s.id).FirstOrDefault();
                     char gpa = 'F';
-                    if ((int)temp.mark_gpa == 4) gpa = 'A';
-                    else if ((int)temp.mark_gpa == 3) gpa = 'B';
-                    else if ((int)temp.mark_gpa == 2) gpa = 'C';
-                    else if ((int)temp.mark_gpa == 1) gpa = 'D';
-                    stt++;
-                    list_result.Add(new MarkBySemester(stt, temp.code, temp.name, (double)mark.mark, (double)mark_exam.mark, (double)temp.mark_final, gpa, (double)temp.mark_gpa, temp.note));
+
+                    if (mark == null || mark_exam == null || temp == null)
+                    {
+                        list_result.Add(new MarkBySemester(cl.className, s.code, s.name, mark == null ? -1 : (double)mark.mark, mark_exam == null ? -1 : (double)mark_exam.mark, temp == null ? -1 : (double)temp.mark_final, gpa, 0, "") { status = -1 });
+                    }
+                    else
+                    {
+                        var stt = models.tbl_student_semester_subject_exam_room.Find(temp.room_id);
+                        if ((int)temp.mark_gpa == 4) gpa = 'A';
+                        else if ((int)temp.mark_gpa == 3) gpa = 'B';
+                        else if ((int)temp.mark_gpa == 2) gpa = 'C';
+                        else if ((int)temp.mark_gpa == 1) gpa = 'D';
+                        list_result.Add(new MarkBySemester(cl.className, s.code, s.name, (double)mark.mark, (double)mark_exam.mark, (double)temp.mark_final, gpa, (double)temp.mark_gpa, temp.note) { status = (stt == null ? 0 : (stt.exam_status_id == null ? 0 : (long)stt.exam_status_id)) });
+                    }
                 }
                 catch (Exception e)
                 {
