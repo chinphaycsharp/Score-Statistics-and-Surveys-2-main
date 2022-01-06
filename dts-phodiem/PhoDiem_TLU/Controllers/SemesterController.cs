@@ -195,67 +195,55 @@ namespace PhoDiem_TLU.Controllers
         {
             try
             {
-                int[] list_mark = { 0, 0, 0, 0, 0 };
-                int[] list_mark_final = { 0, 0, 0, 0, 0 };
-                int[] list_mark_QT = { 0, 0, 0, 0, 0 };
+                int[] listMark = { 0, 0, 0, 0, 0 };
+                int[] listMarkFinal = { 0, 0, 0, 0, 0 };
+                int[] listMarkQT = { 0, 0, 0, 0, 0 };
 
-                var list_result = new List<MarkBySemester>();
+                var list_result = new List<IGrouping<dynamic, MarkBySemester>>();
                 if (listId != null && listId.Count != 0)
                 {
-                    foreach(var id in listId)
+                    if (type == "1")
                     {
-                        if (type == "1")
-                        {
-                            long _id = long.Parse(id);
-                            long _subject = long.Parse(subject);
-                            long _semester = long.Parse(semester);
+                        long _subject = long.Parse(subject);
+                        long _semester = long.Parse(semester);
 
-                            list_result.AddRange(data.GetMarkBySemester(_id, _subject, _semester));
-                        }
-                        else
-                        {
-                            long _id = long.Parse(id);
-                            long _subject = long.Parse(subject);
-                            long _semester = long.Parse(semester);
+                        list_result.AddRange(data.GetMarkBySemester(listId, _subject, _semester));
+                    }
+                    else
+                    {
+                        long _subject = long.Parse(subject);
+                        long _semester = long.Parse(semester);
 
-                            list_result.AddRange(data.GetMarkByClass(_id, _subject, _semester));
-                        }
+                        list_result.AddRange(data.GetMarkByClass(listId, _subject, _semester));
                     }
                 }
+                var resultExam = new List<MarkStatiticBySemester>();
+                var resultFinal = new List<MarkStatiticBySemester>();
+                var resultQt = new List<MarkStatiticBySemester>();
 
-                foreach (var item in list_result)
+                int stt = 0;
+                foreach (var cl in list_result)
                 {
-                    if (item.status != 0) continue;
-                    if (getCharMark(double.Parse(item.mark_exam)) == 0) list_mark[0]++;
-                    else if (getCharMark(double.Parse(item.mark_exam)) == 1) list_mark[1]++;
-                    else if (getCharMark(double.Parse(item.mark_exam)) == 2) list_mark[2]++;
-                    else if (getCharMark(double.Parse(item.mark_exam)) == 3) list_mark[3]++;
-                    else list_mark[4]++;
-
-                    if (getCharMark(double.Parse(item.mark)) == 0) list_mark_QT[0]++;
-                    else if (getCharMark(double.Parse(item.mark)) == 1) list_mark_QT[1]++;
-                    else if (getCharMark(double.Parse(item.mark)) == 2) list_mark_QT[2]++;
-                    else if (getCharMark(double.Parse(item.mark)) == 3) list_mark_QT[3]++;
-                    else list_mark_QT[4]++;
-
-                    if (getCharMark(double.Parse(item.mark_final)) == 0) list_mark_final[0]++;
-                    else if (getCharMark(double.Parse(item.mark_final)) == 1) list_mark_final[1]++;
-                    else if (getCharMark(double.Parse(item.mark_final)) == 2) list_mark_final[2]++;
-                    else if (getCharMark(double.Parse(item.mark_final)) == 3) list_mark_final[3]++;
-                    else list_mark_final[4]++;
+                    int[] list_mark = { 0, 0, 0, 0, 0 };
+                    int[] list_mark_final = { 0, 0, 0, 0, 0 };
+                    int[] list_mark_QT = { 0, 0, 0, 0, 0 };
+                    int total = cl.Where(ss => ss.status == 0).ToList().Count;
+                    for(int i = 0; i < 5; i++)
+                    {
+                        list_mark[i] = cl.Where(ss =>ss.status == 0 && getCharMark(ss.mark_exam) == i).ToList().Count;
+                        list_mark_final[i] = cl.Where(ss => ss.status == 0 && getCharMark(ss.mark_final) == i).ToList().Count;
+                        list_mark_QT[i] = cl.Where(ss => ss.status == 0 && getCharMark(ss.mark) == i).ToList().Count;
+                        listMark[i] += list_mark[i];
+                        listMarkFinal[i] += list_mark_final[i];
+                        listMarkQT[i] += list_mark_QT[i];
+                    }
+                    stt++;
+                    resultExam.Add(new MarkStatiticBySemester(stt,cl.Key.className.ToString(),cl.Key.teacherName.ToString(), list_mark[4], list_mark[3], list_mark[2], list_mark[1], list_mark[0], total, cl.Key.subject.ToString()));
+                    resultFinal.Add(new MarkStatiticBySemester(stt,cl.Key.ToString(), cl.Key.teacherName.ToString(), list_mark_final[4], list_mark_final[3], list_mark_final[2], list_mark_final[1], list_mark_final[0], total, cl.Key.subject.ToString()));
+                    resultQt.Add(new MarkStatiticBySemester(stt,cl.Key.ToString(), cl.Key.teacherName.ToString(), list_mark_QT[4], list_mark_QT[3], list_mark_QT[2], list_mark_QT[1], list_mark_QT[0], total, cl.Key.subject.ToString()));
+                
                 }
-                return Json(new { code = 200, data = list_result.Select(
-                    s=>new { 
-                        s.class_name,
-                        s.student_code,
-                        s.student_name,
-                        s.mark,
-                        s.mark_exam,
-                        s.mark_final,
-                        s.gpa,
-                        s.mark_gpa,
-                        s.note
-                }), chart_mark = new { qt = list_mark_QT, exam = list_mark, final = list_mark_final } }, JsonRequestBehavior.AllowGet);
+                return Json(new { code = 200, data = resultExam, chart_mark = new { qt = listMarkQT, exam = listMark, final = listMarkFinal } }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception e)
             {
@@ -263,13 +251,22 @@ namespace PhoDiem_TLU.Controllers
             }
         }
 
-        public int getCharMark(double mark)
+        public int getCharMark(string m)
         {
-            if (mark <= 10 && mark >= 8.45) return 4;
-            if (mark <= 8.44 && mark >= 6.95) return 3;
-            if (mark <= 6.94 && mark >= 5.45) return 2;
-            if (mark <= 5.44 && mark >= 3.95) return 1;
-            return 0;
+            try
+            {
+                var mark = double.Parse(m);
+                if (mark <= 10 && mark >= 8.45) return 4;
+                if (mark <= 8.44 && mark >= 6.95) return 3;
+                if (mark <= 6.94 && mark >= 5.45) return 2;
+                if (mark <= 5.44 && mark >= 3.95) return 1;
+                return 0;
+            }
+            catch
+            {
+                return -1;
+            }
         }
+        
     }
 }

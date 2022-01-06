@@ -99,7 +99,7 @@
 			//"scrollY": '260px',
 			//"scrollX": true,
 			//"ordering": false,
-			"bAutoWidth": true,
+			"bAutoWidth": false,
 			"paging": options && typeof options.paging != "undefined" ? options.paging : true,
 			"bInfo": options && typeof options.bInfo != "undefined" ? options.bInfo : true,
 			"scrollCollapse": true,

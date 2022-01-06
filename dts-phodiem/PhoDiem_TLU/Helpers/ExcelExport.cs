@@ -24,20 +24,80 @@ namespace PhoDiem_TLU.Helpers
                 // Tạo title cho file Excel
                 excelPackage.Workbook.Properties.Title = "Phổ điểm TLU";
                 int count_ws = 0;
-                foreach (var item in list_gr)
-                {
-                    excelPackage.Workbook.Worksheets.Add((count_ws + 1) + "-" + item.short_code);
-                    ExcelWorksheet workSheet = excelPackage.Workbook.Worksheets[count_ws];
-                    List<MarkBySemester> temp = new List<MarkBySemester>();
-                    try
-                    {
-                        temp = db.GetMarkBySemester(item.id, subject.id, semester.id);
-                    }
-                    catch (Exception e)
-                    {
-                        continue;
-                    }
+                var listResult = db.GetMarkBySemester(list_gr.Select(s=>s.id.ToString()).ToList(), subject.id, semester.id);
 
+                excelPackage.Workbook.Worksheets.Add("Tổng hợp");
+                ExcelWorksheet workSheetDefault = excelPackage.Workbook.Worksheets[count_ws];
+                //sheet tổng hợp
+                #region sheet tổng hợp
+                workSheetDefault.Cells["A1:J1"].Merge = true;
+                workSheetDefault.Cells["A1:J1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheetDefault.Cells["A1:J1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Cells["A1"].Value = "TRƯỜNG ĐẠI HỌC THỦY LỢI";
+
+                workSheetDefault.Cells["A2:J2"].Merge = true;
+                workSheetDefault.Cells["A2:J2"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheetDefault.Cells["A2:J2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Cells["A2"].Value = "PHÒNG KHẢO THÍ VÀ ĐẢM BẢO CHẤT LƯỢNG";
+
+                workSheetDefault.Cells["A4:J4"].Merge = true;
+                workSheetDefault.Cells["A4:J4"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheetDefault.Cells["A4:J4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Cells["A4"].Value = "PHIẾU BÁO ĐIỂM - " + subject.subject_name;
+
+                workSheetDefault.Cells["A5:J5"].Merge = true;
+                workSheetDefault.Cells["A5:J5"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheetDefault.Cells["A5:J5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Cells["A5"].Value = "Học kỳ: " + semester.semester_name;
+
+                workSheetDefault.Cells["A6:C6"].Merge = true;
+                workSheetDefault.Cells["A6"].Value = "Môn: " + subject.subject_name;
+
+                workSheetDefault.Cells["A7:B7"].Merge = true;
+                workSheetDefault.Cells["A7"].Value = "Số tín chỉ: " + subject.number_of_credit;
+
+                workSheetDefault.Cells["A9"].Value = "STT";
+                workSheetDefault.Cells["B9"].Value = "Mã sinh viên";
+                workSheetDefault.Cells["C9:D9"].Merge = true;
+                workSheetDefault.Cells["C9"].Value = "Họ và tên";
+                workSheetDefault.Cells["E9"].Value = "DQT";
+                workSheetDefault.Cells["F9"].Value = "THI";
+                workSheetDefault.Cells["G9"].Value = "TKHP";
+                workSheetDefault.Cells["H9"].Value = "Chữ";
+                workSheetDefault.Cells["I9"].Value = "Hệ 4";
+                workSheetDefault.Cells["J9"].Value = "Ghi chú";
+
+                workSheetDefault.Row(9).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Row(6).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                workSheetDefault.Row(7).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+
+                workSheetDefault.Column(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(3).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(4).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(6).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(7).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(8).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(9).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+                workSheetDefault.Cells["A1:J9"].Style.Font.Bold = true;
+                #endregion
+                int index = 10;
+                int tcA = 0;
+                int tcB = 0;
+                int tcC = 0;
+                int tcD = 0;
+                int tcF = 0;
+                int max = index+2;
+                int total = 0;
+                //thêm các sheet chi tiết
+                foreach (var item in listResult)
+                {
+                    excelPackage.Workbook.Worksheets.Add((count_ws + 1) + "-" + item.Key.className);
+                    ExcelWorksheet workSheet = excelPackage.Workbook.Worksheets[count_ws+1];
+                    List<MarkBySemester> temp = item.ToList();
+                    #region sheet chi tiết
                     workSheet.Cells["A1:J1"].Merge = true;
                     workSheet.Cells["A1:J1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     workSheet.Cells["A1:J1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -51,7 +111,7 @@ namespace PhoDiem_TLU.Helpers
                     workSheet.Cells["A4:J4"].Merge = true;
                     workSheet.Cells["A4:J4"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     workSheet.Cells["A4:J4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                    workSheet.Cells["A4"].Value = "PHIẾU BÁO ĐIỂM - " + item.display_name;
+                    workSheet.Cells["A4"].Value = "PHIẾU BÁO ĐIỂM - " + item.Key.className;
 
                     workSheet.Cells["A5:J5"].Merge = true;
                     workSheet.Cells["A5:J5"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
@@ -90,8 +150,11 @@ namespace PhoDiem_TLU.Helpers
                     workSheet.Column(9).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
                     workSheet.Cells["A1:J9"].Style.Font.Bold = true;
+                    #endregion
+                    max += temp.Count;
                     for (int i = 1; i <= temp.Count; i++)
                     {
+                        #region chi tiết
                         int y = i + 9;
                         var name = temp.ElementAt(i - 1).student_name;
                         workSheet.Cells[y, 1].Value = i;
@@ -104,29 +167,22 @@ namespace PhoDiem_TLU.Helpers
                         workSheet.Cells[y, 8].Value = temp.ElementAt(i - 1).gpa;
                         workSheet.Cells[y, 9].Value = temp.ElementAt(i - 1).mark_gpa;
                         workSheet.Cells[y, 10].Value = temp.ElementAt(i - 1).note;
-                        //if (temp.ElementAt(i-1).status != 0)
-                        //{
-                        //    workSheet.Cells[y, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 1].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 2].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 3].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 4].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 4].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 5].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 6].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 6].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 7].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 7].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 8].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 9].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 9].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 10].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 10].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //}
+                        #endregion
+                        #region tổng hợp
+                        index++;
+                        name = temp.ElementAt(i - 1).student_name;
+                        workSheetDefault.Cells[index, 1].Value = i;
+                        workSheetDefault.Cells[index, 2].Value = temp.ElementAt(i - 1).student_code;
+                        workSheetDefault.Cells[index, 3].Value = name.Substring(0, name.LastIndexOf(" "));
+                        workSheetDefault.Cells[index, 4].Value = name.Substring(name.LastIndexOf(" ") + 1);
+                        workSheetDefault.Cells[index, 5].Value = temp.ElementAt(i - 1).mark;
+                        workSheetDefault.Cells[index, 6].Value = temp.ElementAt(i - 1).mark_exam;
+                        workSheetDefault.Cells[index, 7].Value = temp.ElementAt(i - 1).mark_final;
+                        workSheetDefault.Cells[index, 8].Value = temp.ElementAt(i - 1).gpa;
+                        workSheetDefault.Cells[index, 9].Value = temp.ElementAt(i - 1).mark_gpa;
+                        workSheetDefault.Cells[index, 10].Value = temp.ElementAt(i - 1).note;
+                        #endregion
+
                     }
 
                     int row_max = temp.Count + 11;
@@ -146,6 +202,7 @@ namespace PhoDiem_TLU.Helpers
                     {
                         if(s.status == 0)
                         {
+                            total++;
                             if (double.Parse(s.mark_exam) <= 10 && double.Parse(s.mark_exam) >= 8.45) cA++;
                             if (double.Parse(s.mark_exam) <= 8.44 && double.Parse(s.mark_exam) >= 6.95) cB++;
                             if (double.Parse(s.mark_exam) <= 6.94 && double.Parse(s.mark_exam) >= 5.45) cC++;
@@ -153,7 +210,12 @@ namespace PhoDiem_TLU.Helpers
                             if (double.Parse(s.mark_exam) < 3.95) cF++;
                         }
                     }
-
+                    tcA += cA;
+                    tcB += cB;
+                    tcC += cC;
+                    tcD += cD;
+                    tcF += cF;
+                    #region chi tiết
                     workSheet.Cells["A" + (row_max + 3)].Value = "A";
                     workSheet.Cells["B" + (row_max + 3)].Value = "8.45-10";
                     workSheet.Cells["C" + (row_max + 3)].Value = cA;
@@ -179,23 +241,67 @@ namespace PhoDiem_TLU.Helpers
                     workSheet.Cells["C" + (row_max + 7)].Value = cF;
                     workSheet.Cells["D" + (row_max + 7)].Value = cF * 100 / temp.Count + " %";
 
-                    var d = DateTime.Today.ToString("dd");
-                    var m = DateTime.Today.ToString("MM");
-                    var yy = DateTime.Today.ToString("yyyy");
+                    var dd = DateTime.Today.ToString("dd");
+                    var mm = DateTime.Today.ToString("MM");
+                    var yyyy = DateTime.Today.ToString("yyyy");
                     workSheet.Cells["F" + (row_max + 10) + ":J" + (row_max + 10)].Merge = true;
-                    workSheet.Cells["F" + (row_max + 10) + ":J" + (row_max + 10)].Value = "Hà Nội, ngày " + d + " tháng " + m + " năm " + yy;
+                    workSheet.Cells["F" + (row_max + 10) + ":J" + (row_max + 10)].Value = "Hà Nội, ngày " + dd + " tháng " + mm + " năm " + yyyy;
 
                     workSheet.Cells["G" + (row_max + 11) + ":J" + (row_max + 11)].Merge = true;
                     workSheet.Cells["G" + (row_max + 11) + ":J" + (row_max + 11)].Style.Font.Bold = true;
                     workSheet.Cells["G" + (row_max + 11) + ":J" + (row_max + 11)].Value = "PHÒNG KHẢO THÍ & ĐBCL";
-
+                    #endregion
                     count_ws++;
                     workSheet.Cells.AutoFitColumns();
                 }
+                #region Tổng hợp
+                workSheetDefault.Cells["A" + (max + 1) + ":D" + (max + 1)].Merge = true;
+                workSheetDefault.Cells["A" + (max + 1) + ":D" + (max + 1)].Value = "BẢNG THỐNG KÊ KÊT QUẢ THI";
+                workSheetDefault.Cells["A" + (max + 2)].Value = "Điểm chữ";
+                workSheetDefault.Cells["B" + (max + 2)].Value = "Điểm số";
+                workSheetDefault.Cells["C" + (max + 2)].Value = "Số SV";
+                workSheetDefault.Cells["D" + (max + 2)].Value = "Tỷ lệ %";
+                workSheetDefault.Cells["A" + (max + 3)].Value = "A";
+                workSheetDefault.Cells["B" + (max + 3)].Value = "8.45-10";
+                workSheetDefault.Cells["C" + (max + 3)].Value = tcA;
+                workSheetDefault.Cells["D" + (max + 3)].Value = tcA * 100 / total + " %";
+
+                workSheetDefault.Cells["A" + (max + 4)].Value = "B";
+                workSheetDefault.Cells["B" + (max + 4)].Value = "6.95-8.44";
+                workSheetDefault.Cells["C" + (max + 4)].Value = tcB;
+                workSheetDefault.Cells["D" + (max + 4)].Value = tcB * 100 / total + " %";
+
+                workSheetDefault.Cells["A" + (max + 5)].Value = "C";
+                workSheetDefault.Cells["B" + (max + 5)].Value = "5.45-6.94";
+                workSheetDefault.Cells["C" + (max + 5)].Value = tcC;
+                workSheetDefault.Cells["D" + (max + 5)].Value = tcC * 100 / total + " %";
+
+                workSheetDefault.Cells["A" + (max + 6)].Value = "D";
+                workSheetDefault.Cells["B" + (max + 6)].Value = "3.95-5.44";
+                workSheetDefault.Cells["C" + (max + 6)].Value = tcD;
+                workSheetDefault.Cells["D" + (max + 6)].Value = tcD * 100 / total + " %";
+
+                workSheetDefault.Cells["A" + (max + 7)].Value = "F";
+                workSheetDefault.Cells["B" + (max + 7)].Value = "0-3.94";
+                workSheetDefault.Cells["C" + (max + 7)].Value = tcF;
+                workSheetDefault.Cells["D" + (max + 7)].Value = tcF * 100 / total + " %";
+
+                var d = DateTime.Today.ToString("dd");
+                var m = DateTime.Today.ToString("MM");
+                var yy = DateTime.Today.ToString("yyyy");
+                workSheetDefault.Cells["F" + (max + 10) + ":J" + (max + 10)].Merge = true;
+                workSheetDefault.Cells["F" + (max + 10) + ":J" + (max + 10)].Value = "Hà Nội, ngày " + d + " tháng " + m + " năm " + yy;
+
+                workSheetDefault.Cells["G" + (max + 11) + ":J" + (max + 11)].Merge = true;
+                workSheetDefault.Cells["G" + (max + 11) + ":J" + (max + 11)].Style.Font.Bold = true;
+                workSheetDefault.Cells["G" + (max + 11) + ":J" + (max + 11)].Value = "PHÒNG KHẢO THÍ & ĐBCL";
+                #endregion
+                workSheetDefault.Cells.AutoFitColumns();
                 var file = excelPackage.GetAsByteArray();
                 excelPackage.Dispose();
                 return file;
             }
+        
         }
 
         public Byte[] ExportByClass(List<tbl_enrollment_class> list_gr, tbl_semester semester, tbl_subject subject)
@@ -206,20 +312,80 @@ namespace PhoDiem_TLU.Helpers
                 // Tạo title cho file Excel
                 excelPackage.Workbook.Properties.Title = "Phổ điểm TLU";
                 int count_ws = 0;
-                foreach (var item in list_gr)
-                {
-                    excelPackage.Workbook.Worksheets.Add((count_ws + 1) + "-" + item.className);
-                    ExcelWorksheet workSheet = excelPackage.Workbook.Worksheets[count_ws];
-                    List<MarkBySemester> temp = new List<MarkBySemester>();
-                    try
-                    {
-                        temp = db.GetMarkByClass(item.id, subject.id, semester.id);
-                    }
-                    catch (Exception e)
-                    {
-                        continue;
-                    }
+                var listResult = db.GetMarkByClass(list_gr.Select(s => s.id.ToString()).ToList(), subject.id, semester.id);
 
+                excelPackage.Workbook.Worksheets.Add("Tổng hợp");
+                ExcelWorksheet workSheetDefault = excelPackage.Workbook.Worksheets[count_ws];
+                //sheet tổng hợp
+                #region sheet tổng hợp
+                workSheetDefault.Cells["A1:J1"].Merge = true;
+                workSheetDefault.Cells["A1:J1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheetDefault.Cells["A1:J1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Cells["A1"].Value = "TRƯỜNG ĐẠI HỌC THỦY LỢI";
+
+                workSheetDefault.Cells["A2:J2"].Merge = true;
+                workSheetDefault.Cells["A2:J2"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheetDefault.Cells["A2:J2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Cells["A2"].Value = "PHÒNG KHẢO THÍ VÀ ĐẢM BẢO CHẤT LƯỢNG";
+
+                workSheetDefault.Cells["A4:J4"].Merge = true;
+                workSheetDefault.Cells["A4:J4"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheetDefault.Cells["A4:J4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Cells["A4"].Value = "PHIẾU BÁO ĐIỂM - " + subject.subject_name;
+
+                workSheetDefault.Cells["A5:J5"].Merge = true;
+                workSheetDefault.Cells["A5:J5"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheetDefault.Cells["A5:J5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Cells["A5"].Value = "Học kỳ: " + semester.semester_name;
+
+                workSheetDefault.Cells["A6:C6"].Merge = true;
+                workSheetDefault.Cells["A6"].Value = "Môn: " + subject.subject_name;
+
+                workSheetDefault.Cells["A7:B7"].Merge = true;
+                workSheetDefault.Cells["A7"].Value = "Số tín chỉ: " + subject.number_of_credit;
+
+                workSheetDefault.Cells["A9"].Value = "STT";
+                workSheetDefault.Cells["B9"].Value = "Mã sinh viên";
+                workSheetDefault.Cells["C9:D9"].Merge = true;
+                workSheetDefault.Cells["C9"].Value = "Họ và tên";
+                workSheetDefault.Cells["E9"].Value = "DQT";
+                workSheetDefault.Cells["F9"].Value = "THI";
+                workSheetDefault.Cells["G9"].Value = "TKHP";
+                workSheetDefault.Cells["H9"].Value = "Chữ";
+                workSheetDefault.Cells["I9"].Value = "Hệ 4";
+                workSheetDefault.Cells["J9"].Value = "Ghi chú";
+
+                workSheetDefault.Row(9).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Row(6).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                workSheetDefault.Row(7).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+
+                workSheetDefault.Column(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(3).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(4).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(6).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(7).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(8).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheetDefault.Column(9).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+                workSheetDefault.Cells["A1:J9"].Style.Font.Bold = true;
+                #endregion
+                int index = 10;
+                int tcA = 0;
+                int tcB = 0;
+                int tcC = 0;
+                int tcD = 0;
+                int tcF = 0;
+                int max = index+2;
+                int total = 0;
+                //thêm các sheet chi tiết
+                foreach (var item in listResult)
+                {
+                    excelPackage.Workbook.Worksheets.Add((count_ws + 1) + "-" + item.Key.className);
+                    ExcelWorksheet workSheet = excelPackage.Workbook.Worksheets[count_ws + 1];
+                    List<MarkBySemester> temp = item.ToList();
+                    #region sheet chi tiết
                     workSheet.Cells["A1:J1"].Merge = true;
                     workSheet.Cells["A1:J1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     workSheet.Cells["A1:J1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -233,7 +399,7 @@ namespace PhoDiem_TLU.Helpers
                     workSheet.Cells["A4:J4"].Merge = true;
                     workSheet.Cells["A4:J4"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     workSheet.Cells["A4:J4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                    workSheet.Cells["A4"].Value = "PHIẾU BÁO ĐIỂM - " + item.className;
+                    workSheet.Cells["A4"].Value = "PHIẾU BÁO ĐIỂM - " + item.Key.className;
 
                     workSheet.Cells["A5:J5"].Merge = true;
                     workSheet.Cells["A5:J5"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
@@ -256,7 +422,6 @@ namespace PhoDiem_TLU.Helpers
                     workSheet.Cells["H9"].Value = "Chữ";
                     workSheet.Cells["I9"].Value = "Hệ 4";
                     workSheet.Cells["J9"].Value = "Ghi chú";
-                    workSheet.Cells["K9"].Value = temp.Count;
 
                     workSheet.Row(9).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     workSheet.Row(6).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
@@ -273,8 +438,11 @@ namespace PhoDiem_TLU.Helpers
                     workSheet.Column(9).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
                     workSheet.Cells["A1:J9"].Style.Font.Bold = true;
+                    #endregion
+                    max += temp.Count;
                     for (int i = 1; i <= temp.Count; i++)
                     {
+                        #region chi tiết
                         int y = i + 9;
                         var name = temp.ElementAt(i - 1).student_name;
                         workSheet.Cells[y, 1].Value = i;
@@ -287,32 +455,32 @@ namespace PhoDiem_TLU.Helpers
                         workSheet.Cells[y, 8].Value = temp.ElementAt(i - 1).gpa;
                         workSheet.Cells[y, 9].Value = temp.ElementAt(i - 1).mark_gpa;
                         workSheet.Cells[y, 10].Value = temp.ElementAt(i - 1).note;
-                        //if (temp.ElementAt(i-1).status != 0)
-                        //{
-                        //    workSheet.Cells[y, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 1].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 2].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 3].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 4].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 4].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 5].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 6].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 6].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 7].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 7].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 8].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 9].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 9].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //    workSheet.Cells[y, 10].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //    workSheet.Cells[y, 10].Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFF00"));
-                        //}
+                        #endregion
+                        #region tổng hợp
+                        index++;
+                        name = temp.ElementAt(i - 1).student_name;
+                        workSheetDefault.Cells[index, 1].Value = i;
+                        workSheetDefault.Cells[index, 2].Value = temp.ElementAt(i - 1).student_code;
+                        workSheetDefault.Cells[index, 3].Value = name.Substring(0, name.LastIndexOf(" "));
+                        workSheetDefault.Cells[index, 4].Value = name.Substring(name.LastIndexOf(" ") + 1);
+                        workSheetDefault.Cells[index, 5].Value = temp.ElementAt(i - 1).mark;
+                        workSheetDefault.Cells[index, 6].Value = temp.ElementAt(i - 1).mark_exam;
+                        workSheetDefault.Cells[index, 7].Value = temp.ElementAt(i - 1).mark_final;
+                        workSheetDefault.Cells[index, 8].Value = temp.ElementAt(i - 1).gpa;
+                        workSheetDefault.Cells[index, 9].Value = temp.ElementAt(i - 1).mark_gpa;
+                        workSheetDefault.Cells[index, 10].Value = temp.ElementAt(i - 1).note;
+                        #endregion
+
                     }
 
                     int row_max = temp.Count + 11;
+
+                    workSheet.Cells["A" + (row_max + 1) + ":D" + (row_max + 1)].Merge = true;
+                    workSheet.Cells["A" + (row_max + 1) + ":D" + (row_max + 1)].Value = "BẢNG THỐNG KÊ KÊT QUẢ THI";
+                    workSheet.Cells["A" + (row_max + 2)].Value = "Điểm chữ";
+                    workSheet.Cells["B" + (row_max + 2)].Value = "Điểm số";
+                    workSheet.Cells["C" + (row_max + 2)].Value = "Số SV";
+                    workSheet.Cells["D" + (row_max + 2)].Value = "Tỷ lệ %";
                     int cA = 0;
                     int cB = 0;
                     int cC = 0;
@@ -322,6 +490,7 @@ namespace PhoDiem_TLU.Helpers
                     {
                         if (s.status == 0)
                         {
+                            total++;
                             if (double.Parse(s.mark_exam) <= 10 && double.Parse(s.mark_exam) >= 8.45) cA++;
                             if (double.Parse(s.mark_exam) <= 8.44 && double.Parse(s.mark_exam) >= 6.95) cB++;
                             if (double.Parse(s.mark_exam) <= 6.94 && double.Parse(s.mark_exam) >= 5.45) cC++;
@@ -329,7 +498,12 @@ namespace PhoDiem_TLU.Helpers
                             if (double.Parse(s.mark_exam) < 3.95) cF++;
                         }
                     }
-
+                    tcA += cA;
+                    tcB += cB;
+                    tcC += cC;
+                    tcD += cD;
+                    tcF += cF;
+                    #region chi tiết
                     workSheet.Cells["A" + (row_max + 3)].Value = "A";
                     workSheet.Cells["B" + (row_max + 3)].Value = "8.45-10";
                     workSheet.Cells["C" + (row_max + 3)].Value = cA;
@@ -355,23 +529,67 @@ namespace PhoDiem_TLU.Helpers
                     workSheet.Cells["C" + (row_max + 7)].Value = cF;
                     workSheet.Cells["D" + (row_max + 7)].Value = cF * 100 / temp.Count + " %";
 
-                    var d = DateTime.Today.ToString("dd");
-                    var m = DateTime.Today.ToString("MM");
-                    var yy = DateTime.Today.ToString("yyyy");
+                    var dd = DateTime.Today.ToString("dd");
+                    var mm = DateTime.Today.ToString("MM");
+                    var yyyy = DateTime.Today.ToString("yyyy");
                     workSheet.Cells["F" + (row_max + 10) + ":J" + (row_max + 10)].Merge = true;
-                    workSheet.Cells["F" + (row_max + 10) + ":J" + (row_max + 10)].Value = "Hà Nội, ngày " + d + " tháng " + m + " năm " + yy;
+                    workSheet.Cells["F" + (row_max + 10) + ":J" + (row_max + 10)].Value = "Hà Nội, ngày " + dd + " tháng " + mm + " năm " + yyyy;
 
                     workSheet.Cells["G" + (row_max + 11) + ":J" + (row_max + 11)].Merge = true;
                     workSheet.Cells["G" + (row_max + 11) + ":J" + (row_max + 11)].Style.Font.Bold = true;
                     workSheet.Cells["G" + (row_max + 11) + ":J" + (row_max + 11)].Value = "PHÒNG KHẢO THÍ & ĐBCL";
-
+                    #endregion
                     count_ws++;
                     workSheet.Cells.AutoFitColumns();
                 }
+                #region Tổng hợp
+                workSheetDefault.Cells["A" + (max + 1) + ":D" + (max + 1)].Merge = true;
+                workSheetDefault.Cells["A" + (max + 1) + ":D" + (max + 1)].Value = "BẢNG THỐNG KÊ KÊT QUẢ THI";
+                workSheetDefault.Cells["A" + (max + 2)].Value = "Điểm chữ";
+                workSheetDefault.Cells["B" + (max + 2)].Value = "Điểm số";
+                workSheetDefault.Cells["C" + (max + 2)].Value = "Số SV";
+                workSheetDefault.Cells["D" + (max + 2)].Value = "Tỷ lệ %";
+                workSheetDefault.Cells["A" + (max + 3)].Value = "A";
+                workSheetDefault.Cells["B" + (max + 3)].Value = "8.45-10";
+                workSheetDefault.Cells["C" + (max + 3)].Value = tcA;
+                workSheetDefault.Cells["D" + (max + 3)].Value = tcA * 100 / total + " %";
+
+                workSheetDefault.Cells["A" + (max + 4)].Value = "B";
+                workSheetDefault.Cells["B" + (max + 4)].Value = "6.95-8.44";
+                workSheetDefault.Cells["C" + (max + 4)].Value = tcB;
+                workSheetDefault.Cells["D" + (max + 4)].Value = tcB * 100 / total + " %";
+
+                workSheetDefault.Cells["A" + (max + 5)].Value = "C";
+                workSheetDefault.Cells["B" + (max + 5)].Value = "5.45-6.94";
+                workSheetDefault.Cells["C" + (max + 5)].Value = tcC;
+                workSheetDefault.Cells["D" + (max + 5)].Value = tcC * 100 / total + " %";
+
+                workSheetDefault.Cells["A" + (max + 6)].Value = "D";
+                workSheetDefault.Cells["B" + (max + 6)].Value = "3.95-5.44";
+                workSheetDefault.Cells["C" + (max + 6)].Value = tcD;
+                workSheetDefault.Cells["D" + (max + 6)].Value = tcD * 100 / total + " %";
+
+                workSheetDefault.Cells["A" + (max + 7)].Value = "F";
+                workSheetDefault.Cells["B" + (max + 7)].Value = "0-3.94";
+                workSheetDefault.Cells["C" + (max + 7)].Value = tcF;
+                workSheetDefault.Cells["D" + (max + 7)].Value = tcF * 100 / total + " %";
+
+                var d = DateTime.Today.ToString("dd");
+                var m = DateTime.Today.ToString("MM");
+                var yy = DateTime.Today.ToString("yyyy");
+                workSheetDefault.Cells["F" + (max + 10) + ":J" + (max + 10)].Merge = true;
+                workSheetDefault.Cells["F" + (max + 10) + ":J" + (max + 10)].Value = "Hà Nội, ngày " + d + " tháng " + m + " năm " + yy;
+
+                workSheetDefault.Cells["G" + (max + 11) + ":J" + (max + 11)].Merge = true;
+                workSheetDefault.Cells["G" + (max + 11) + ":J" + (max + 11)].Style.Font.Bold = true;
+                workSheetDefault.Cells["G" + (max + 11) + ":J" + (max + 11)].Value = "PHÒNG KHẢO THÍ & ĐBCL";
+                #endregion
+                workSheetDefault.Cells.AutoFitColumns();
                 var file = excelPackage.GetAsByteArray();
                 excelPackage.Dispose();
                 return file;
             }
+
         }
 
         public Byte[] ExportExcelDataCourseSubject(string markOption, string subjectName, long numberOfCredit, long startYear, long EndYear, List<Data> dataMark)

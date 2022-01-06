@@ -36,12 +36,7 @@ $('.dropdown-container')
     
 
 
-$(document).ready(function () {
-    var table = $("#table_id").DataTable({
-        "autoWidth": false
-    });
 
-})
 
 function ql() {
     listClass = new Set();
@@ -148,11 +143,13 @@ function change(res, type) {
     }).done(function (response) {
         if (response.data != null) {
             if (response.code == 200) {
-                let data1 = response.data.map(Object.values);
+                let data1 = response.data.map(Object.values);;
                 chart_data = response.chart_mark;
                 $("#table_id").DataTable().clear();
                 $("#table_id").DataTable().rows.add(data1);
                 $("#table_id").DataTable().draw();
+                $("#table_id>thead>tr .headTb").css('width', "10%");
+
                 $("#_loading").hide();
                 $("#main_content").show()
             }
@@ -216,47 +213,6 @@ function setFillter() {
     event.preventDefault(); // <- avoid reloading
 }
 
-//function xuat1(id) {
-//    $.ajax({
-//        type: "POST",
-//        url: "/Semester/Export",
-//        data: {
-//            type: value.type,
-//            subject: value.subject,
-//            semester: value.semester,
-//            data: id
-//        },
-//        error: function (a, b, c) {
-//            console.log(a);
-//            console.log(b);
-//        },
-//    }).done(function (r) {
-//        if (r.code == 200) {
-//            //Convert Base64 string to Byte Array.
-//            var bytes = Base64ToBytes(r.data);
-
-//            //Convert Byte Array to BLOB.
-//            var blob = new Blob([bytes], { type: "application/octetstream/xlsx" });
-
-//            //Check the Browser type and download the File.
-//            var isIE = false || !!document.documentMode;
-//            if (isIE) {
-//                window.navigator.msSaveBlob(blob, r.name);
-//            } else {
-//                var url = window.URL || window.webkitURL;
-//                link = url.createObjectURL(blob);
-//                var a = $("<a />");
-//                a.attr("download", r.name);
-//                a.attr("href", link);
-//                $("body").append(a);
-//                a[0].click();
-//                $("body").remove(a);
-//            }
-
-//        }
-//        else console.log(r.mgs);
-//    });
-//}
 function xuat() {
     $.ajax({
         type: "POST",
@@ -324,7 +280,19 @@ var dataLabel = ['F', 'D', 'C', 'B', 'A'];
 var massPopChart1 = new Chart(myChart1, setChart('Biểu đồ phân bố điểm thi', chart_data.exam, 'Điểm thi'));
 var massPopChart = new Chart(myChart, setChart('Biểu đồ phân bố điểm quá trình', chart_data.qt, 'Điểm quá trình'));
 var massPopChart2 = new Chart(myChart2, setChart('Biểu đồ phân bố điểm tổng kết', chart_data.final, 'Điểm tổng kết'));
+$(document).ready(function () {
+    var table = $("#table_id").DataTable();
+    //var data = [
+    //    [1, 'Giải tích 2-1-19 (61CTM+KTO_01)', 'teacher', 3, 5.172413793103448, 1, 1.7241379310344827, 0, 0, 10, 17.24137931034483, 44, 75.86206896551724, 'môn học'],
+    //    [1, 'Giải tích 2-1-19 (61CTM+KTO_01)', 'teacher', 3, 5.172413793103448, 1, 1.7241379310344827, 0, 0, 10, 17.24137931034483, 44, 75.86206896551724, 'môn học'],
+    //    [1, 'Giải tích 2-1-19 (61CTM+KTO_01)', 'teacher', 3, 5.172413793103448, 1, 1.7241379310344827, 0, 0, 10, 17.24137931034483, 44, 75.86206896551724, 'môn học'],
 
+    //];
+    //console.log(data);
+    //$("#table_id").DataTable().clear();
+    //$("#table_id").DataTable().rows.add(data);
+    //$("#table_id").DataTable().draw();
+})
 function setChart(title, data, label) {
     return {
         type: 'bar', // bar, horizontalBar, pie, line, doughnut, radar, polarArea
