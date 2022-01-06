@@ -1462,6 +1462,5 @@ C:\project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\bin\Antlr
 C:\project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
 C:\project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\obj\Debug\PhoDiem_TLU.csproj.AssemblyReference.cache
 C:\project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\obj\Debug\PhoDiem_TLU.csproj.CoreCompileInputs.cache
-C:\project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\obj\Debug\PhoDiem_TLU.csproj.CopyComplete
 C:\project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\obj\Debug\PhoDiem_TLU.dll
 C:\project\Score-Statistics-and-Surveys-2-main\dts-phodiem\PhoDiem_TLU\obj\Debug\PhoDiem_TLU.pdb
